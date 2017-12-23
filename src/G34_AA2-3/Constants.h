@@ -1,0 +1,71 @@
+#pragma once
+#include <iostream>
+
+#define SCREEN_FPS 60.0f
+#define SCREEN_TICKS_PER_FRAME (1.0f / SCREEN_FPS)
+
+#define SCREEN_WIDTH 720
+#define SCREEN_HEIGHT 704
+
+#define HUD_WIDTH 624
+#define HUD_HEIGHT 80
+
+//player constants:
+#define STEPS 16;
+
+
+const std::string MENU_BG = "MENU_BG";
+const std::string LEVEL_BG = "LEVEL_BG";
+const std::string PLAYER1_SPRITE = "PLAYER1_SPRITE";
+const std::string PLAYER2_SPRITE = "PLAYER2_SPRITE";
+
+const std::string ITEMS = "ITEMS";
+const std::string EXPLOSIONS = "EXPLOSIONS";
+
+const std::string PLAY_TEXT_SCORE_PLAYER1 = "PLAY_TEXT_SCORE_PLAYER1";
+const std::string MENU_TEXT_BUTTON_LEVEL1 = "MENU_TEXT_BUTTON_LEVEL1";
+const std::string MENU_TEXT_BUTTON_LEVEL2 = "MENU_TEXT_BUTTON_LEVEL2";
+const std::string MENU_TEXT_BUTTON_RANKING = "MENU_TEXT_BUTTON_RANKING";
+const std::string MENU_TEXT_BUTTON_DISABLESOUND = "MENU_TEXT_BUTTON_DISABLESOUND";
+const std::string MENU_TEXT_BUTTON_ENABLESOUND = "MENU_TEXT_BUTTON_ENABLESOUND";
+const std::string MENU_TEXT_BUTTON_EXIT = "MENU_TEXT_BUTTON_EXIT";
+
+const std::string MENU_TEXT_BUTTON_LEVEL1_HOVER = "MENU_TEXT_BUTTON_LEVEL1_HOVER";
+const std::string MENU_TEXT_BUTTON_LEVEL2_HOVER = "MENU_TEXT_BUTTON_LEVEL2_HOVER";
+const std::string MENU_TEXT_BUTTON_RANKING_HOVER = "MENU_TEXT_BUTTON_RANKING_HOVER";
+const std::string MENU_TEXT_BUTTON_DISABLESOUND_HOVER = "MENU_TEXT_BUTTON_DISABLESOUND_HOVER";
+const std::string MENU_TEXT_BUTTON_ENABLESOUND_HOVER = "MENU_TEXT_BUTTON_ENABLESOUND_HOVER";
+const std::string MENU_TEXT_BUTTON_EXIT_HOVER = "MENU_TEXT_BUTTON_EXIT_HOVER";
+
+const std::string RANKING_TEXT_BUTTON_RETURN = "RANKING_TEXT_BUTTON_RETURN";
+const std::string RANKING_TEXT_BUTTON_RETURN_HOVER = "RANKING_TEXT_BUTTON_RETURN_HOVER";
+const std::string RANKING_TEXT_WINNER = "RANKING_TEXT_WINNER";
+const std::string RANKING_TEXT_WINNER1 = "RANKING_TEXT_WINNER1";
+const std::string RANKING_TEXT_WINNER2 = "RANKING_TEXT_WINNER2";
+const std::string RANKING_TEXT_WINNER3 = "RANKING_TEXT_WINNER3";
+const std::string RANKING_TEXT_WINNER4 = "RANKING_TEXT_WINNER4";
+const std::string RANKING_TEXT_WINNER5 = "RANKING_TEXT_WINNER5";
+const std::string RANKING_TEXT_WINNER6 = "RANKING_TEXT_WINNER6";
+const std::string RANKING_TEXT_WINNER7 = "RANKING_TEXT_WINNER7";
+const std::string RANKING_TEXT_WINNER8 = "RANKING_TEXT_WINNER8";
+const std::string RANKING_TEXT_WINNER9 = "RANKING_TEXT_WINNER9";
+const std::string RANKING_TEXT_WINNER10 = "RANKING_TEXT_WINNER10";
+
+const std::string TIME_TEXT = "TIME_TEXT";
+const std::string PLAYER1_TEXT = "PLAYER1_TEXT";
+const std::string PLAYER2_TEXT = "PLAYER2_TEXT";
+const std::string ACTUAL_PLAYER1_LIVES_TEXT = "ACTUAL_PLAYER1_LIVES_TEXT";
+const std::string ACTUAL_PLAYER2_LIVES_TEXT = "ACTUAL_PLAYER2_LIVES_TEXT";
+const std::string ACTUAL_PLAYER1_POINTS_TEXT = "ACTUAL_PLAYER1_POINTS_TEXT";
+const std::string ACTUAL_PLAYER2_POINTS_TEXT = "ACTUAL_PLAYER2_POINTS_TEXT";
+
+const std::string PATH_IMG = "../../res/img/";
+const std::string PATH_FONT = "../../res/ttf/";
+const std::string PATH_AU = "../../res/au/";
+const std::string PATH_FILES = "../../res/files/";
+
+const std::string SAIYAN = "SAIYAN";
+const std::string GAME_OVER = "GAME_OVER";
+//const std::string ARIAL = "ARIAL";
+
+
