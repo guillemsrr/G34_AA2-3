@@ -2,12 +2,11 @@
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 #include "rapidxml_iterators.hpp"
-#include "rapidxml_print.hpp"
-
+#include "rapidxml_print.hpp"
 #include <algorithm>
 #include <vector>
-
 #include <fstream>
+
 Level::Level(int num, bool mute) : exit{ false }, lvlNumber{ num }, frameTime { 0 }, keyDown{ 0 }, p1{ new Player(1) }, p2{ new Player(2) }, m_hud{ new HUD(p1, p2) }
 {
 	m_sceneState= Scene::SceneState::Running;
@@ -61,7 +60,7 @@ Level::Level(int num, bool mute) : exit{ false }, lvlNumber{ num }, frameTime { 
 		rapidxml::xml_document<> doc;
 		rapidxml::xml_node<> * root_node;
 		// Read the xml file into a vector
-		std::ifstream theFile("../../res/files/Bomberman_Map_Level2.xml");
+		std::ifstream theFile("../../res/files/config.xml");
 		std::vector<char> buffer((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
 		buffer.push_back('\0');
 		// Parse the buffer using the xml file parsing library into doc
@@ -548,187 +547,210 @@ void Level::checkDamage(Player *p)
 {
 	if (p->explosionLimits[0])
 	{
-		if (grid[p->ptrBomb->posJ][p->ptrBomb->posI - 2] == "player1")
+		int f = p->ptrBomb->posI - 2;
+		int c = p->ptrBomb->posJ;
+
+		if (grid[f][c] == "player1")
 		{
 			p1->lives--;
 			if(p->getPlayerTag() == 2) p2->points += 100;
-			grid[p->ptrBomb->posJ][p->ptrBomb->posI - 2] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[p->ptrBomb->posJ][p->ptrBomb->posI - 2] == "player2")
+		else if (grid[f][c] == "player2")
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
-			grid[p->ptrBomb->posJ][p->ptrBomb->posI - 2] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p2);
 		}
-		else if (grid[p->ptrBomb->posJ][p->ptrBomb->posI - 2] == "wall")
+		else if (grid[f][c] == "wall")
 		{
 			p->points += 15;
-			detectWall(p->ptrBomb->posJ, p->ptrBomb->posI - 2);
-			grid[p->ptrBomb->posJ][p->ptrBomb->posI - 2] = "empty";
+			detectWall(f, c);
+			grid[f][c] = "empty";
 		}
 	}
 	if (p->explosionLimits[1])
 	{
-		if (grid[p->ptrBomb->posJ][p->ptrBomb->posI - 1] == "player1")
+		int f = p->ptrBomb->posI - 1;
+		int c = p->ptrBomb->posJ;
+
+		if (grid[f][c] == "player1")
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
-			grid[p->ptrBomb->posJ][p->ptrBomb->posI - 1] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[p->ptrBomb->posJ][p->ptrBomb->posI - 1] == "player2")
+		else if (grid[f][c] == "player2")
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
-			grid[p->ptrBomb->posJ][p->ptrBomb->posI - 1] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p2);
 		}
-		else if (grid[p->ptrBomb->posJ][p->ptrBomb->posI - 1] == "wall")
+		else if (grid[f][c] == "wall")
 		{
 			p->points += 15;
-			detectWall(p->ptrBomb->posJ, p->ptrBomb->posI - 1);
-			grid[p->ptrBomb->posJ][p->ptrBomb->posI - 1] = "empty";
+			detectWall(f, c);
+			grid[f][c] = "empty";
 		}
 	}
 	if (p->explosionLimits[2])
 	{
+		int f = p->ptrBomb->posI;
+		int c = p->ptrBomb->posJ-1;
 
-		if (grid[p->ptrBomb->posJ-1][p->ptrBomb->posI] == "player1")
+		if (grid[f][c] == "player1")
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
-			grid[p->ptrBomb->posJ-1][p->ptrBomb->posI] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[p->ptrBomb->posJ-1][p->ptrBomb->posI] == "player2")
+		else if (grid[f][c] == "player2")
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
-			grid[p->ptrBomb->posJ - 1][p->ptrBomb->posI] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p2);
 		}
-		else if (grid[p->ptrBomb->posJ-1][p->ptrBomb->posI] == "wall")
+		else if (grid[f][c] == "wall")
 		{
 			p->points += 15;
-			detectWall(p->ptrBomb->posJ -1, p->ptrBomb->posI);
-			grid[p->ptrBomb->posJ - 1][p->ptrBomb->posI] = "empty";
+			detectWall(f, c);
+			grid[f][c] = "empty";
 		}
 	}
 	if (p->explosionLimits[3])
 	{
-		if (grid[p->ptrBomb->posJ - 2][p->ptrBomb->posI] == "player1")
+		int f = p->ptrBomb->posI;
+		int c = p->ptrBomb->posJ-2;
+
+		if (grid[f][c] == "player1")
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
-			grid[p->ptrBomb->posJ - 2][p->ptrBomb->posI] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[p->ptrBomb->posJ -2][p->ptrBomb->posI] == "player2")
+		else if (grid[f][c] == "player2")
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
-			grid[p->ptrBomb->posJ - 2][p->ptrBomb->posI] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p2);
 		}
-		else if (grid[p->ptrBomb->posJ - 2][p->ptrBomb->posI] == "wall")
+		else if (grid[f][c] == "wall")
 		{
 			p->points += 15;
-			detectWall(p->ptrBomb->posJ -2, p->ptrBomb->posI);
-			grid[p->ptrBomb->posJ - 2][p->ptrBomb->posI] = "empty";
+			detectWall(f, c);
+			grid[f][c] = "empty";
 		}
 	}
 	if (p->explosionLimits[4])
 	{
-		if (grid[p->ptrBomb->posJ + 1][p->ptrBomb->posI] == "player1")
+		int f = p->ptrBomb->posI;
+		int c = p->ptrBomb->posJ+1;
+
+		if (grid[f][c] == "player1")
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
-			grid[p->ptrBomb->posJ + 1][p->ptrBomb->posI] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[p->ptrBomb->posJ + 1][p->ptrBomb->posI] == "player2")
+		else if (grid[f][c] == "player2")
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
-			grid[p->ptrBomb->posJ + 1][p->ptrBomb->posI] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p2);
 		}
-		else if (grid[p->ptrBomb->posJ + 1][p->ptrBomb->posI] == "wall")
+		else if (grid[f][c] == "wall")
 		{
 			p->points += 15;
-			detectWall(p->ptrBomb->posJ +1, p->ptrBomb->posI);
-			grid[p->ptrBomb->posJ + 1][p->ptrBomb->posI] = "empty";
+			detectWall(f, c);
+			grid[f][c] = "empty";
 		}
 	}
 	if (p->explosionLimits[5])
 	{
-		if (grid[p->ptrBomb->posJ + 2][p->ptrBomb->posI] == "player1")
+		int f = p->ptrBomb->posI;
+		int c = p->ptrBomb->posJ+2;
+
+		if (grid[f][c] == "player1")
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
-			grid[p->ptrBomb->posJ + 2][p->ptrBomb->posI] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[p->ptrBomb->posJ + 2][p->ptrBomb->posI] == "player2")
+		else if (grid[f][c] == "player2")
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
-			grid[p->ptrBomb->posJ + 2][p->ptrBomb->posI] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p2);
 		}
-		else if (grid[p->ptrBomb->posJ + 2][p->ptrBomb->posI] == "wall")
+		else if (grid[f][c] == "wall")
 		{
 			p->points += 15;
-			detectWall(p->ptrBomb->posJ +2, p->ptrBomb->posI);
-			grid[p->ptrBomb->posJ + 2][p->ptrBomb->posI] = "empty";
+			detectWall(f, c);
+			grid[f][c] = "empty";
 		}
 	}
 	if (p->explosionLimits[6])
 	{
-		if (grid[p->ptrBomb->posJ][p->ptrBomb->posI + 1] == "player1")
+		int f = p->ptrBomb->posI + 1;
+		int c = p->ptrBomb->posJ;
+
+		if (grid[f][c] == "player1")
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
-			grid[p->ptrBomb->posJ][p->ptrBomb->posI + 1] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[p->ptrBomb->posJ][p->ptrBomb->posI + 1] == "player2")
+		else if (grid[f][c] == "player2")
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
-			grid[p->ptrBomb->posJ][p->ptrBomb->posI - 1] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p2);
 		}
-		else if (grid[p->ptrBomb->posJ][p->ptrBomb->posI + 1] == "wall")
+		else if (grid[f][c] == "wall")
 		{
 			p->points += 15;
-			detectWall(p->ptrBomb->posJ, p->ptrBomb->posI + 1);
-			grid[p->ptrBomb->posJ][p->ptrBomb->posI + 1] = "empty";
+			detectWall(f, c);
+			grid[f][c] = "empty";
 		}
 	}
 	if (p->explosionLimits[7])
 	{
-		if (grid[p->ptrBomb->posJ][p->ptrBomb->posI + 2] == "player1")
+		int f = p->ptrBomb->posI + 2;
+		int c = p->ptrBomb->posJ;
+
+		if (grid[f][c] == "player1")
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
-			grid[p->ptrBomb->posJ][p->ptrBomb->posI + 2] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[p->ptrBomb->posJ][p->ptrBomb->posI - 2] == "player2")
+		else if (grid[f][c] == "player2")
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
-			grid[p->ptrBomb->posJ][p->ptrBomb->posI + 2] = "empty";
+			grid[f][c] = "empty";
 			changePlayerLocation(p2);
 		}
-		else if (grid[p->ptrBomb->posJ][p->ptrBomb->posI + 2] == "wall")
+		else if (grid[f][c] == "wall")
 		{
 			p->points += 15;
-			detectWall(p->ptrBomb->posJ, p->ptrBomb->posI + 2);
-			grid[p->ptrBomb->posJ][p->ptrBomb->posI + 2] = "empty";
+			detectWall(f, c);
+			grid[f][c] = "empty";
 		}
 	}	
 }
@@ -738,15 +760,14 @@ void Level::changePlayerLocation(Player *p) //faltaria veure què passaria si no 
 	bool done = false;
 	while (!done)
 	{
-		int i= rand() % 13;
-		int j = rand() % 11;
+		int i= rand() % 11;
+		int j = rand() % 13;
 		if (grid[i][j] == "empty")
 		{
 			grid[i][j] = "player" + std::to_string(p->getPlayerTag());
 			p->posI = i;
 			p->posJ = j;
-			p->playerPosition.x = SCREEN_WIDTH - SCREEN_WIDTH / 15 * i;
-			p->playerPosition.y = (SCREEN_HEIGHT - 80) / 13 * j + 80;
+			p->playerPosition = { static_cast<int>((SCREEN_WIDTH / 15)* (j + 1)), static_cast<int>(((SCREEN_HEIGHT - 80) / 13)* (i + 1) + 80), 48,48 };
 			done = true;
 		}
 	}
