@@ -12,6 +12,7 @@ public:
 	void EventHandler() override;
 	void Update() override;
 	void Draw() override;
+
 private:
 	std::vector<winner> rankingVector;
 	const std::string rankingFile= PATH_FILES + "ranking.bin";

@@ -840,7 +840,10 @@ void Level::putNameRanking(Player *p)
 		std::cin >> w.name;
 		w.points = p->points;
 		std::ofstream fsalida(rankingFile, std::ios::out | std::ios::binary);
-		fsalida.write(reinterpret_cast<char *>(&n), sizeof(n));
-		fsalida.write(reinterpret_cast<char *>(&w), sizeof(w));
+		fsalida.write(reinterpret_cast<char *>(&n), sizeof(int));
+		fsalida.write(reinterpret_cast<char *>(&w.name), sizeof(std::string));
+		fsalida.write(reinterpret_cast<char *>(&w.points), sizeof(int));
+
+		fsalida.close();
 	}
 }
