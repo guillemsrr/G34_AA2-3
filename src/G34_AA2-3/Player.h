@@ -15,6 +15,8 @@ public:
 	~Player();
 	int getPlayerTag();
 	SDL_Rect playerPosition, playerRect;
+	bool explosionLimits[8];
+	void restartExplosionLimits();
 	void bomb(bool explodingLimits[8]);
 	Bomb *ptrBomb;
 	bool isInPosition();

@@ -4,9 +4,9 @@ HUD::HUD(Player *p1, Player *p2): player1{p1}, player2{p2}
 {
 	start = time(0);
 	timer = 80;
-	Renderer::Instance()->LoadFont({ SAIYAN, PATH_FONT + "saiyan.ttf", 80 });	
-	Renderer::Instance()->LoadTextureText(SAIYAN, { PLAYER1_TEXT, "Player 1:     lives,    points",{ 255, 255, 255, 255 } ,HUD_WIDTH , HUD_HEIGHT });
-	Renderer::Instance()->LoadTextureText(SAIYAN, { PLAYER2_TEXT, "Player 2:     lives,    points",{ 255, 255, 255, 255 } ,HUD_WIDTH , HUD_HEIGHT});
+	Renderer::Instance()->LoadFont({ GAME_OVER, PATH_FONT + "game_over.ttf", 80 });	
+	Renderer::Instance()->LoadTextureText(GAME_OVER, { PLAYER1_TEXT, "Player 1:     lives,    points",{ 255, 255, 255, 255 } ,HUD_WIDTH , HUD_HEIGHT });
+	Renderer::Instance()->LoadTextureText(GAME_OVER, { PLAYER2_TEXT, "Player 2:     lives,    points",{ 255, 255, 255, 255 } ,HUD_WIDTH , HUD_HEIGHT});
 }
 
 HUD::~HUD()
@@ -18,13 +18,13 @@ void HUD::Update()
 	if (difftime(time(0), start) == 1)
 	{
 		timer--;
-		Renderer::Instance()->LoadTextureText(SAIYAN, { TIME_TEXT, std::to_string(timer),{ 255, 255, 255, 255 } ,HUD_WIDTH/3 *2, HUD_HEIGHT/2 });
+		Renderer::Instance()->LoadTextureText(GAME_OVER, { TIME_TEXT, std::to_string(timer),{ 255, 255, 255, 255 } ,HUD_WIDTH/3 *2, HUD_HEIGHT/2 });
 		start = time(0);
 	}
-	Renderer::Instance()->LoadTextureText(SAIYAN, { ACTUAL_PLAYER1_LIVES_TEXT, std::to_string(player1->lives),{ 255, 0, 0, 255 } ,HUD_WIDTH, HUD_HEIGHT});
-	Renderer::Instance()->LoadTextureText(SAIYAN, { ACTUAL_PLAYER2_LIVES_TEXT, std::to_string(player2->lives),{ 255, 0, 0, 255 } ,HUD_WIDTH , HUD_HEIGHT });
-	Renderer::Instance()->LoadTextureText(SAIYAN, { ACTUAL_PLAYER1_POINTS_TEXT, std::to_string(player1->points),{ 255, 255, 0, 255 } ,HUD_WIDTH, HUD_HEIGHT });
-	Renderer::Instance()->LoadTextureText(SAIYAN, { ACTUAL_PLAYER2_POINTS_TEXT, std::to_string(player2->points),{ 255, 255, 0, 255 } ,HUD_WIDTH , HUD_HEIGHT });
+	Renderer::Instance()->LoadTextureText(GAME_OVER, { ACTUAL_PLAYER1_LIVES_TEXT, std::to_string(player1->lives),{ 255, 0, 0, 255 } ,HUD_WIDTH, HUD_HEIGHT});
+	Renderer::Instance()->LoadTextureText(GAME_OVER, { ACTUAL_PLAYER2_LIVES_TEXT, std::to_string(player2->lives),{ 255, 0, 0, 255 } ,HUD_WIDTH , HUD_HEIGHT });
+	Renderer::Instance()->LoadTextureText(GAME_OVER, { ACTUAL_PLAYER1_POINTS_TEXT, std::to_string(player1->points),{ 255, 255, 0, 255 } ,HUD_WIDTH, HUD_HEIGHT });
+	Renderer::Instance()->LoadTextureText(GAME_OVER, { ACTUAL_PLAYER2_POINTS_TEXT, std::to_string(player2->points),{ 255, 255, 0, 255 } ,HUD_WIDTH , HUD_HEIGHT });
 }
 
 void HUD::Draw()

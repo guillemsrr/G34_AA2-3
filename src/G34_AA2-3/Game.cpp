@@ -50,8 +50,10 @@ void Game::run()
 			switch (m_gameState)
 			{
 			case GameState::MENU:
+				bool mute;
+				mute = m_currentScene->m_mute;
 				delete m_currentScene;
-				m_currentScene = new Level(1);
+				m_currentScene = new Level(1,mute);
 				m_gameState = GameState::LEVEL1;
 				break;
 			default:
@@ -62,8 +64,10 @@ void Game::run()
 			switch (m_gameState)
 			{
 			case GameState::MENU:
+				bool mute;
+				mute = m_currentScene->m_mute;
 				delete m_currentScene;
-				m_currentScene = new Level(2);
+				m_currentScene = new Level(2,mute);
 				m_gameState = GameState::LEVEL2;
 				break;
 			default:
@@ -78,17 +82,17 @@ void Game::run()
 				m_currentScene = new Ranking();
 				m_gameState = GameState::RANKING;
 				break;
-			//case GameState::LEVEL1:
-			//	delete m_currentScene;
-			//	m_currentScene = new Ranking();
-			//	m_gameState = GameState::RANKING;
-			//	break;
-			//case GameState::LEVEL2:
-			//	delete m_currentScene;
-			//	m_currentScene = new Ranking();
-			//	m_gameState = GameState::RANKING;
-			//	break;
-			//default:
+			case GameState::LEVEL1:
+				delete m_currentScene;
+				m_currentScene = new Ranking();
+				m_gameState = GameState::RANKING;
+				break;
+			case GameState::LEVEL2:
+				delete m_currentScene;
+				m_currentScene = new Ranking();
+				m_gameState = GameState::RANKING;
+				break;
+			default:
 				break;
 			}
 			break;

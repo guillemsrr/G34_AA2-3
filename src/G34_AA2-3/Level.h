@@ -15,7 +15,7 @@ class Level :
 	public Scene
 {
 public:
-	Level(int num);
+	Level(int num, bool mute);
 	~Level();
 	void EventHandler() override;
 	void Update() override;
@@ -30,13 +30,10 @@ private:
 	SDL_Rect blockRect, wallRect; //helmetRect, shieldRect, rollerRect;
 	std::list<SDL_Rect> blockList;
 	bool exit;
+
 	//explosions:
-	bool explosionLimits[8];
 	void setExplosionLimits(Player *p);
-	void restartExplosionLimits();
-	bool explosionLimits2[8];
-	void setExplosionLimits2(Player *p);
-	void restartExplosionLimits2();
+
 	void checkDamage(Player *p);
 	void changePlayerLocation(Player *p);
 	HUD *m_hud;
@@ -48,5 +45,9 @@ private:
 	const std::string rankingFile = PATH_FILES + "ranking.bin";
 	bool fileExists(const std::string fileName);
 	void putNameRanking(Player *p);
+
+	//AUDIO
+	const Uint8 mixFlags{ MIX_INIT_MP3 | MIX_INIT_OGG };
+	Mix_Music *soundtrack{ Mix_LoadMUS("../../res/au/game_theme.mp3") };
 };
 

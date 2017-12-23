@@ -1,10 +1,9 @@
 #include "Ranking.h"
 
 
-
 Ranking::Ranking():hoverReturn{false}, mouseClicked{false}, exit{false}
 {
-	m_sceneState = SceneState::Running;
+	m_sceneState = Scene::SceneState::Running;
 	mouseRect.w = 0;
 	mouseRect.h = 0;
 
@@ -24,24 +23,56 @@ Ranking::Ranking():hoverReturn{false}, mouseClicked{false}, exit{false}
 		fentrada.read(reinterpret_cast<char *>(&n), sizeof(n));
 		std::cout << "[RANKING] number of winners: " << n << std::endl;
 
-		for (int i = 0; i <= n; i++)
+
+		for (int i = 0; i < n; i++)
 		{
 			fentrada.read(reinterpret_cast<char *>(&w), sizeof(w));
 			rankingVector.push_back(w);
 		}
 		fentrada.close();	
-	}
 
-	for (int i = 0; i < rankingVector.size(); i++)
-	{
-		Renderer::Instance()->LoadTextureText(GAME_OVER, { RANKING_TEXT_WINNER + std::to_string(i) , rankingVector[i].name + " won with " + std::to_string(rankingVector[i].points) + " points",{ 255, 255, 255, 255 } ,SCREEN_WIDTH , 81 });
+		for (int i = 0; i <= rankingVector.size(); i++)
+		{
+			Renderer::Instance()->LoadTextureText(GAME_OVER, { RANKING_TEXT_WINNER + std::to_string(i+1) , rankingVector[i].name + " won with " + std::to_string(rankingVector[i].points) + " points",{ 255, 255, 255, 255 } ,SCREEN_WIDTH , 81 });
+		}
 	}
-	
 }
 
 
 Ranking::~Ranking()
 {
+}
+
+void Ranking::Update()
+{
+	if (isCollisioning(mouseRect, returnRect)) hoverReturn = true;
+	else hoverReturn = false;
+
+	if (hoverReturn && mouseClicked) m_sceneState = Scene::SceneState::GoToMenu;
+}
+
+void Ranking::Draw()
+{
+	Renderer::Instance()->Clear();
+
+	if (fileExists(rankingFile) && rankingVector.size()!=0)
+	{
+		for (int i = 0; i < rankingVector.size(); i++)
+		{
+			Renderer::Instance()->PushImage(RANKING_TEXT_WINNER + std::to_string(i+1), { static_cast<int>(SCREEN_WIDTH / 2.5), static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / rankingVector.size()) * (i+1)), 145, 81 });
+		}
+	}
+	
+	if (hoverReturn)
+	{
+		Renderer::Instance()->PushImage(RANKING_TEXT_BUTTON_RETURN_HOVER, returnRect);
+	}
+	else
+	{
+		Renderer::Instance()->PushImage(RANKING_TEXT_BUTTON_RETURN, returnRect);
+	}
+
+	Renderer::Instance()->Render();
 }
 
 void Ranking::EventHandler()
@@ -69,37 +100,6 @@ void Ranking::EventHandler()
 	}
 }
 
-void Ranking::Update()
-{
-	if (isCollisioning(mouseRect, returnRect)) hoverReturn = true;
-	else hoverReturn = false;
-
-	if (hoverReturn && mouseClicked) m_sceneState = Scene::SceneState::GoToMenu;
-}
-
-void Ranking::Draw()
-{
-	Renderer::Instance()->Clear();
-
-	if (rankingVector.size() != 0)
-	{
-		for (int i = 0; i <= rankingVector.size(); i++)
-		{
-			Renderer::Instance()->PushImage(RANKING_TEXT_WINNER + std::to_string(i), { static_cast<int>(SCREEN_WIDTH / 2.5), static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / rankingVector.size()) * i), 145, 81 });
-		}
-	}
-	
-	if (hoverReturn)
-	{
-		Renderer::Instance()->PushImage(RANKING_TEXT_BUTTON_RETURN_HOVER, returnRect);
-	}
-	else
-	{
-		Renderer::Instance()->PushImage(RANKING_TEXT_BUTTON_RETURN, returnRect);
-	}
-
-	Renderer::Instance()->Render();
-}
 
 bool Ranking::fileExists(const std::string fileName)
 {

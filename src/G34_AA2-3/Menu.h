@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Menu.h"
 
+
 class Menu : public Scene
 {
 public:
@@ -19,6 +20,10 @@ private:
 	static constexpr SDL_Rect soundRect = { static_cast<int>(SCREEN_WIDTH / 2.5),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 5) * 2),137,81 };
 	static constexpr SDL_Rect exitRect = { static_cast<int>(SCREEN_WIDTH / 2.5),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 5)*1), 145,81 };
 
-	bool hoverLevel1, hoverLevel2, hoverRanking, hoverSound, hoverExit, mute, mouseClicked, exit;
+	bool hoverLevel1, hoverLevel2, hoverRanking, hoverSound, hoverExit, mouseClicked, exit;
 	SDL_Rect mouseRect;
+
+	//AUDIO
+	const Uint8 mixFlags{ MIX_INIT_MP3 | MIX_INIT_OGG };
+	Mix_Music *soundtrack{ Mix_LoadMUS("../../res/au/menu.mp3") };
 };

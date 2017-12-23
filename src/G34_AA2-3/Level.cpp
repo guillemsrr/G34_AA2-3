@@ -1,6 +1,6 @@
 #include "Level.h"
 
-Level::Level(int num) : exit{ false }, lvlNumber{ num }, frameTime{ 0 }, keyDown{ 0 }, p1{ new Player(1) }, p2{ new Player(2) }, m_hud{new HUD(p1, p2)}
+Level::Level(int num, bool mute) : exit{ false }, lvlNumber{ num }, frameTime { 0 }, keyDown{ 0 }, p1{ new Player(1) }, p2{ new Player(2) }, m_hud{ new HUD(p1, p2) }
 {
 	m_sceneState= Scene::SceneState::Running;
 	Renderer::Instance()->LoadTexture(LEVEL_BG, PATH_IMG + "bgGame.jpg");
@@ -40,11 +40,23 @@ Level::Level(int num) : exit{ false }, lvlNumber{ num }, frameTime{ 0 }, keyDown
 			}
 			//posar els blocks
 
-
 			else grid[i][j] = "empty";
 		}
 	}
-	restartExplosionLimits();
+
+	// Audio:
+	m_mute = mute;
+	if (!m_mute)
+	{
+		if (!(Mix_Init(mixFlags) &mixFlags)) throw "Error: SDL_Mix init";
+		if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024) == -1) throw "";
+
+
+		if (!soundtrack) throw "unable to open SDL soundtrack";
+		Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
+		Mix_PlayMusic(soundtrack, -1);
+	}
+	p1->restartExplosionLimits();
 }
 
 Level::~Level()
@@ -76,15 +88,23 @@ void Level::EventHandler()
 void Level::Update()
 {
 	if (exit) m_sceneState = Scene::SceneState::Exit;
-	if (m_hud->timer <= 0 || p1->lives==0|| p2->lives==0)
+	int prova = 0;
+	//prova = 78;
+	if (m_hud->timer <= prova || p1->lives==0|| p2->lives==0)
 	{
+		p1->points = prova;
+
 		if (p1->points > p2->points)
 		{
 			putNameRanking(p1);
 		}
-		else
+		else if(p2->points> p1->points)
 		{
 			putNameRanking(p2);
+		}
+		else
+		{
+			std::cout << "Tie!\n";
 		}
 		m_sceneState = Scene::SceneState::GoToRanking;
 	}
@@ -195,7 +215,7 @@ void Level::Update()
 				if (p2->isInPosition())
 				{
 					grid[p2->posJ][p2->posI] = "empty";
-					p1->posJ--;
+					p2->posI--;
 					grid[p2->posJ][p2->posI] = "player2";
 				}
 			}
@@ -214,7 +234,7 @@ void Level::Update()
 				if (p2->isInPosition())
 				{
 					grid[p2->posJ][p2->posI] = "empty";
-					p1->posJ--;
+					p2->posJ--;
 					grid[p2->posJ][p2->posI] = "player2";
 				}
 			}
@@ -233,7 +253,7 @@ void Level::Update()
 				if (p2->isInPosition())
 				{
 					grid[p2->posJ][p2->posI] = "empty";
-					p1->posI++;
+					p2->posI++;
 					grid[p2->posJ][p2->posI] = "player2";
 				}
 			}
@@ -252,7 +272,7 @@ void Level::Update()
 				if (p2->isInPosition())
 				{
 					grid[p2->posJ][p2->posI] = "empty";
-					p1->posJ++;
+					p2->posJ++;
 					grid[p2->posJ][p2->posI] = "player2";
 				}
 			}
@@ -263,7 +283,7 @@ void Level::Update()
 			if (p1->ptrBomb == nullptr)
 			{
 				setExplosionLimits(p1);
-				p1->bomb(explosionLimits);
+				p1->bomb(p1->explosionLimits);
 			}
 		}
 		if (keyDown == SDLK_RCTRL)
@@ -271,7 +291,7 @@ void Level::Update()
 			if (p2->ptrBomb == nullptr)
 			{
 				setExplosionLimits(p2);
-				p2->bomb(explosionLimits2);//
+				p2->bomb(p2->explosionLimits);//
 			}
 		}
 
@@ -458,12 +478,12 @@ void Level::Update()
 			if (p1->ptrBomb->explode)
 			{
 				checkDamage(p1);
-				//checkDamage(p2);
+				checkDamage(p2);
 			}
 		}
 		if (p1->ptrBomb->end)
 		{
-			restartExplosionLimits();
+			p1->restartExplosionLimits();
 			delete p1->ptrBomb;
 			p1->ptrBomb = nullptr;
 		}
@@ -477,12 +497,12 @@ void Level::Update()
 			if (p2->ptrBomb->explode)
 			{
 				checkDamage(p1);
-				//checkDamage(p2);
+				checkDamage(p2);
 			}
 		}
 		if (p2->ptrBomb->end)
 		{
-			restartExplosionLimits();
+			p2->restartExplosionLimits();
 			delete p2->ptrBomb;
 			p2->ptrBomb = nullptr;
 		}
@@ -550,55 +570,46 @@ void Level::setExplosionLimits(Player *p)
 {
 	if (p->posI - 1 >= 0 && grid[p->posJ][p->posI - 1] != "block")
 	{
-		//p->expl...
-		explosionLimits[1] = true;
+		p->explosionLimits[1] = true;
 		if (p->posI - 2 >= 0 && grid[p->posJ][p->posI - 2] != "block")
 		{
-			explosionLimits[0] = true;
+			p->explosionLimits[0] = true;
 		}
 	}
 	
 	if (p->posI + 1 <= 10 && grid[p->posJ][p->posI + 1] != "block")
 	{
-		explosionLimits[6] = true;
+		p->explosionLimits[6] = true;
 		if (p->posI + 2 <= 10 && grid[p->posJ][p->posI + 2] != "block")
 		{
-			explosionLimits[7] = true;
+			p->explosionLimits[7] = true;
 		}
 	}
 	
 	if (p->posJ - 1 >= 0 && grid[p->posJ - 1][p->posI] != "block")
 	{
-		explosionLimits[2] = true;
+		p->explosionLimits[2] = true;
 		if (p->posJ - 2 >= 0 && grid[p->posJ - 2][p->posI] != "block")
 		{
-			explosionLimits[3] = true;
+			p->explosionLimits[3] = true;
 		}
 	}
 	
 	if (p->posJ + 1 <= 12 && grid[p->posJ + 1][p->posI] != "block")
 	{
-		explosionLimits[4] = true;
+		p->explosionLimits[4] = true;
 		if (p->posJ + 2 <= 12 && grid[p->posJ + 2][p->posI] != "block")
 		{
-			explosionLimits[5] = true;
+			p->explosionLimits[5] = true;
 		}
 	}
 	
 
 }
 
-void Level::restartExplosionLimits()
-{
-	for (int i = 0; i <= 7; i++)
-	{
-		explosionLimits[i] = false;
-	}
-}
-
 void Level::checkDamage(Player *p)
 {
-	if (explosionLimits[0])
+	if (p->explosionLimits[0])
 	{
 		if (grid[p->ptrBomb->posJ][p->ptrBomb->posI - 2] == "player1")
 		{
@@ -621,7 +632,7 @@ void Level::checkDamage(Player *p)
 			grid[p->ptrBomb->posJ][p->ptrBomb->posI - 2] = "empty";
 		}
 	}
-	if (explosionLimits[1])
+	if (p->explosionLimits[1])
 	{
 		if (grid[p->ptrBomb->posJ][p->ptrBomb->posI - 1] == "player1")
 		{
@@ -644,7 +655,7 @@ void Level::checkDamage(Player *p)
 			grid[p->ptrBomb->posJ][p->ptrBomb->posI - 1] = "empty";
 		}
 	}
-	if (explosionLimits[2])
+	if (p->explosionLimits[2])
 	{
 
 		if (grid[p->ptrBomb->posJ-1][p->ptrBomb->posI] == "player1")
@@ -668,7 +679,7 @@ void Level::checkDamage(Player *p)
 			grid[p->ptrBomb->posJ - 1][p->ptrBomb->posI] = "empty";
 		}
 	}
-	if (explosionLimits[3])
+	if (p->explosionLimits[3])
 	{
 		if (grid[p->ptrBomb->posJ - 2][p->ptrBomb->posI] == "player1")
 		{
@@ -691,7 +702,7 @@ void Level::checkDamage(Player *p)
 			grid[p->ptrBomb->posJ - 2][p->ptrBomb->posI] = "empty";
 		}
 	}
-	if (explosionLimits[4])
+	if (p->explosionLimits[4])
 	{
 		if (grid[p->ptrBomb->posJ + 1][p->ptrBomb->posI] == "player1")
 		{
@@ -714,7 +725,7 @@ void Level::checkDamage(Player *p)
 			grid[p->ptrBomb->posJ + 1][p->ptrBomb->posI] = "empty";
 		}
 	}
-	if (explosionLimits[5])
+	if (p->explosionLimits[5])
 	{
 		if (grid[p->ptrBomb->posJ + 2][p->ptrBomb->posI] == "player1")
 		{
@@ -737,7 +748,7 @@ void Level::checkDamage(Player *p)
 			grid[p->ptrBomb->posJ + 2][p->ptrBomb->posI] = "empty";
 		}
 	}
-	if (explosionLimits[6])
+	if (p->explosionLimits[6])
 	{
 		if (grid[p->ptrBomb->posJ][p->ptrBomb->posI + 1] == "player1")
 		{
@@ -760,7 +771,7 @@ void Level::checkDamage(Player *p)
 			grid[p->ptrBomb->posJ][p->ptrBomb->posI + 1] = "empty";
 		}
 	}
-	if (explosionLimits[7])
+	if (p->explosionLimits[7])
 	{
 		if (grid[p->ptrBomb->posJ][p->ptrBomb->posI + 2] == "player1")
 		{
@@ -839,7 +850,7 @@ void Level::putNameRanking(Player *p)
 
 		std::vector<winner> rankingVector;
 
-		for (int i = 0; i <= n; i++)
+		for (int i = 0; i < n; i++)
 		{
 			fentrada.read(reinterpret_cast<char *>(&w), sizeof(w));
 			if (!introduced && p->points > w.points)
@@ -856,7 +867,7 @@ void Level::putNameRanking(Player *p)
 				}
 				introduced = true;
 			}
-			if (i <= 10)
+			if (i < 10)
 			{
 				rankingVector.push_back(w);
 			}
@@ -867,7 +878,7 @@ void Level::putNameRanking(Player *p)
 		{
 			std::ofstream fsalida(rankingFile, std::ios::out | std::ios::binary);
 			fsalida.write(reinterpret_cast<char *>(&n), sizeof(n));
-			for (int i = 0; i <= n; i++)
+			for (int i = 0; i < n; i++)
 			{
 				w = rankingVector[i];
 				fsalida.write(reinterpret_cast<char *>(&w), sizeof(w));

@@ -49,3 +49,11 @@ bool Player::isInPosition()
 		return false;
 }
 
+void Player::restartExplosionLimits()
+{
+	for (int i = 0; i <= 7; i++)
+	{
+		explosionLimits[i] = false;
+	}
+}
+

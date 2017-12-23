@@ -1,7 +1,7 @@
 #include "Menu.h"
 
 
-Menu::Menu() :hoverLevel1{ false }, hoverLevel2{ false }, hoverRanking{ false }, hoverExit{ false }, hoverSound{ false }, mute{ false }, mouseClicked { false }, exit{ false }//, mouseRect.w{0}, mouseRect.h{0}
+Menu::Menu() :hoverLevel1{ false }, hoverLevel2{ false }, hoverRanking{ false }, hoverExit{ false }, hoverSound{ false }, mouseClicked { false }, exit{ false }//, mouseRect.w{0}, mouseRect.h{0}
 {
 	m_sceneState = SceneState::Running;
 	mouseRect.w = 0;
@@ -21,6 +21,15 @@ Menu::Menu() :hoverLevel1{ false }, hoverLevel2{ false }, hoverRanking{ false },
 	Renderer::Instance()->LoadTextureText(SAIYAN, { MENU_TEXT_BUTTON_DISABLESOUND_HOVER, "DISABLE SOUND",{ 89,11,236,255 } ,SCREEN_WIDTH / 2 ,81 });
 	Renderer::Instance()->LoadTextureText(SAIYAN, { MENU_TEXT_BUTTON_ENABLESOUND, "ENABLE SOUND",{ 23,54,56,255 } ,SCREEN_WIDTH / 2 ,81 });
 	Renderer::Instance()->LoadTextureText(SAIYAN, { MENU_TEXT_BUTTON_ENABLESOUND_HOVER, "ENABLE SOUND",{ 89,11,236,255 } ,SCREEN_WIDTH / 2 ,81 });
+
+	
+	if (!(Mix_Init(mixFlags) &mixFlags)) throw "Error: SDL_Mix init";
+	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024) == -1) throw "";
+
+	
+	if (!soundtrack) throw "unable to open SDL soundtrack";
+	Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
+	
 }
 
 
@@ -63,14 +72,14 @@ void Menu::Draw()
 	}
 	if (hoverSound) 
 	{
-		if (mute) Renderer::Instance()->PushImage(MENU_TEXT_BUTTON_ENABLESOUND_HOVER, soundRect);
+		if (m_mute) Renderer::Instance()->PushImage(MENU_TEXT_BUTTON_ENABLESOUND_HOVER, soundRect);
 		else Renderer::Instance()->PushImage(MENU_TEXT_BUTTON_DISABLESOUND_HOVER, soundRect);
 
 		
 	}
 	else
 	{
-		if(mute) Renderer::Instance()->PushImage(MENU_TEXT_BUTTON_ENABLESOUND, soundRect);
+		if(m_mute) Renderer::Instance()->PushImage(MENU_TEXT_BUTTON_ENABLESOUND, soundRect);
 		else Renderer::Instance()->PushImage(MENU_TEXT_BUTTON_DISABLESOUND, soundRect);
 		
 	}
@@ -132,9 +141,17 @@ void Menu::Update()
 	if (hoverRanking && mouseClicked) m_sceneState = Scene::SceneState::GoToRanking;
 	if (hoverSound && mouseClicked)
 	{
-		mute = !mute;
+		if (m_mute)
+		{
+			Mix_PlayMusic(soundtrack, -1);
+		}
+		else
+		{
+			Mix_HaltMusic();
+		}
+		m_mute = !m_mute;
 		mouseClicked = false;
-		//treure el so.
+		
 	}
 	if (exit||hoverExit && mouseClicked) m_sceneState = Scene::SceneState::Exit;
 }
