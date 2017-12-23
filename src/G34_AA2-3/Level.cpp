@@ -382,14 +382,13 @@ void Level::Update()
 		}
 		else if (p2->key == SDLK_RCTRL)
 		{
-			std::cout << "player 1:  " << p1->posI << " " << p1->posJ << std::endl;
-			std::cout << "player 2:  " << p2->posI << " " << p2->posJ << std::endl;
-			/*if (p2->ptrBomb == nullptr)
+		
+			if (p2->ptrBomb == nullptr)
 			{
 				setExplosionLimits(p2);
 				p2->bomb(p2->explosionLimits);
 				p2->key = NULL;
-			}*/
+			}
 		}
 	}
 
