@@ -32,7 +32,7 @@ void Wall::Draw()
 
 void Wall::destroyWall()
 {
-	if ((rand() % 100) < 20)
+	if ((rand() % 100) < 100)
 	{
 		powerUpMode = true;
 		createPowerUp();
@@ -44,6 +44,11 @@ void Wall::destroyWall()
 void Wall::createPowerUp()
 {
 	wallRect = { frameWidth*(rand() % 2 + 1), frameHeight,frameWidth,frameHeight };
+}
+
+void Wall::playerGotIt()
+{
+	destroy = true;
 }
 
 

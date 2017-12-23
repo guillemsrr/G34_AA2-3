@@ -17,6 +17,7 @@ public:
 	SDL_Rect wallRect, wallPosition;
 
 	bool destroy;
+	void playerGotIt();
 private:
 	void createPowerUp();
 	bool powerUpMode;

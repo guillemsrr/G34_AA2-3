@@ -4,6 +4,7 @@
 Ranking::Ranking():hoverReturn{false}, mouseClicked{false}, exit{false}
 {
 	m_sceneState = Scene::SceneState::Running;
+
 	mouseRect.w = 0;
 	mouseRect.h = 0;
 
@@ -20,20 +21,23 @@ Ranking::Ranking():hoverReturn{false}, mouseClicked{false}, exit{false}
 		int n;
 		winner w;
 		std::ifstream fentrada(rankingFile, std::ios::in | std::ios::binary);
-		fentrada.read(reinterpret_cast<char *>(&n), sizeof(n));
+		fentrada.read(reinterpret_cast<char *>(&n), sizeof(int));
 		std::cout << "[RANKING] number of winners: " << n << std::endl;
-
 
 		for (int i = 0; i < n; i++)
 		{
-			fentrada.read(reinterpret_cast<char *>(&w), sizeof(w));
+			fentrada.read(reinterpret_cast<char *>(&w.name), sizeof(std::string));
+			fentrada.read(reinterpret_cast<char *>(&w.points), sizeof(int));
+			std::cout << "[RANKING] number of winners: " << w.name<< w.points<<std::endl;
 			rankingVector.push_back(w);
 		}
-		fentrada.close();	
 
-		for (int i = 0; i <= rankingVector.size(); i++)
+		fentrada.close();
+
+		for (int i = 0; i < rankingVector.size(); i++)
 		{
-			Renderer::Instance()->LoadTextureText(GAME_OVER, { RANKING_TEXT_WINNER + std::to_string(i+1) , rankingVector[i].name + " won with " + std::to_string(rankingVector[i].points) + " points",{ 255, 255, 255, 255 } ,SCREEN_WIDTH , 81 });
+			Renderer::Instance()->LoadTextureText(GAME_OVER, { RANKING_TEXT_WINNER + std::to_string(i+1) , rankingVector[i].name + " won with " + std::to_string(rankingVector[i].points) + " points",{ 0, 0, 0, 255 } ,SCREEN_WIDTH , 81 });
+			std::cout << &rankingVector[i] << std::endl;
 		}
 	}
 }
