@@ -1,5 +1,13 @@
 #include "Level.h"
+#include "rapidxml.hpp"
+#include "rapidxml_utils.hpp"
+#include "rapidxml_iterators.hpp"
+#include "rapidxml_print.hpp"
 
+#include <algorithm>
+#include <vector>
+
+#include <fstream>
 Level::Level(int num, bool mute) : exit{ false }, lvlNumber{ num }, frameTime { 0 }, keyDown{ 0 }, p1{ new Player(1) }, p2{ new Player(2) }, m_hud{ new HUD(p1, p2) }
 {
 	m_sceneState= Scene::SceneState::Running;
@@ -12,33 +20,70 @@ Level::Level(int num, bool mute) : exit{ false }, lvlNumber{ num }, frameTime { 
 	frameHeight = textHeight / 2;
 
 	blockRect = { 0,0, frameWidth,frameHeight };
-	wallRect = { frameWidth,0,frameWidth,frameHeight };
-
+	frameWidth = textWidth / 3;
+	frameHeight = textHeight / 2;
+	wallRect = { frameWidth, 0,frameWidth,frameHeight };
+	
 	//start the grid:
-	for (int i = 0; i <= 10; i++)// i ->files (Y)
+	if (lvlNumber == 1)
 	{
-		for (int j = 0; j <= 12; j++)//j ->columnes (X)
+		for (int i = 0; i <= 10; i++)// i ->files
 		{
-			if (i == 5 && j == 0)
+			for (int j = 0; j <= 12; j++)//j ->columnes
 			{
-				grid[i][j] = "player1";
-				p1->posI = i;
-				p1->posJ = j;
+				if (i == 5 && j == 0)
+				{
+					grid[i][j] = "player1";
+					p1->posI = i;
+					p1->posJ = j;
+				}
+				else if (i == 5 && j == 12)
+				{
+					grid[i][j] = "player2";
+					p2->posI = i;
+					p2->posJ = j;
+				}
+				else if (i % 2 == 1 && j % 2 == 1)
+					grid[i][j] = "block";
+				else if (rand() % 4 == 1)
+				{
+					wallList.push_back(new Wall(i, j));
+					grid[i][j] = "wall";
+				}
+				//posar els blocks
+
+				else grid[i][j] = "empty";
 			}
-			else if (i == 5 && j == 12)
-			{
-				grid[i][j] = "player2";
-				p2->posI = i;
-				p2->posJ = j;
-			}
-			else if (i % 2 == 1 && j % 2 == 1 )
-				grid[i][j] = "block";
-			else if (rand() % 4 == 1)
-			{
-				wallList.push_back(new Wall(i,j));
-				grid[i][j] = "wall";
-			}
-			else grid[i][j] = "empty";
+		}
+	}
+	else
+	{
+		rapidxml::xml_document<> doc;
+		rapidxml::xml_node<> * root_node;
+		// Read the xml file into a vector
+		std::ifstream theFile("../../res/files/Bomberman_Map_Level2.xml");
+		std::vector<char> buffer((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
+		buffer.push_back('\0');
+		// Parse the buffer using the xml file parsing library into doc
+		doc.parse<0>(&buffer[0]);
+
+		root_node = doc.first_node("Map");
+		int i = 0;
+		for (rapidxml::xml_node<> * casillas = root_node->first_node("Casilla"); casillas; casillas = casillas->next_sibling())
+		{
+
+
+
+			rapidxml::xml_node<> * casillainfo = casillas->first_node("Position");
+
+			int tempx = atoi(casillainfo->first_attribute("X")->value());
+			int	tempy = atoi(casillainfo->first_attribute("Y")->value());;
+			//std::cout << i << std::endl;//tempx << "  " << tempy << std::endl;
+			casillainfo = casillas->first_node("Content");
+			std::string tempstr = casillainfo->first_attribute("contenido")->value();
+
+			grid[tempy][tempx] = tempstr;
+
 		}
 	}
 
@@ -121,9 +166,11 @@ void Level::Update()
 			}
 			std::cout << std::endl;
 		}
-		keyDown = NULL;
-	}
 
+		keyDown = NULL;
+		std::cout << std::endl; std::cout << std::endl; std::cout << std::endl; std::cout << std::endl; std::cout << std::endl; std::cout << std::endl;
+
+	}
 	//Players movement:
 
 	//Handle KeyDown
@@ -250,7 +297,7 @@ void Level::Update()
 		//Player 2:
 		if (p2->key == SDLK_UP && p2->posI>0)
 		{
-			if (grid[p2->posI-1][p2->posJ] == "empty")
+			if (grid[p2->posI - 1][p2->posJ] == "empty")
 			{
 				p2->moving = true;
 				frameTime = 0;
@@ -261,15 +308,15 @@ void Level::Update()
 				p2->playerPosition.y -= STEPS;
 				if (p2->isInPosition())
 				{
-					grid[p1->posI][p1->posJ] = "empty";
+					grid[p2->posI][p2->posJ] = "empty";
 					p2->posI--;
-					grid[p1->posI][p1->posJ] = "player2";
+					grid[p2->posI][p2->posJ] = "player2";
 				}
 			}
 		}
 		else if (p2->key == SDLK_LEFT && p2->posJ>0)
 		{
-			if (grid[p2->posI][p2->posJ-1] == "empty")
+			if (grid[p2->posI][p2->posJ - 1] == "empty")
 			{
 				p2->moving = true;
 				frameTime = 0;
@@ -280,15 +327,15 @@ void Level::Update()
 				p2->playerPosition.x -= STEPS;
 				if (p2->isInPosition())
 				{
-					grid[p1->posI][p1->posJ] = "empty";
+					grid[p2->posI][p2->posJ] = "empty";
 					p2->posJ--;
-					grid[p1->posI][p1->posJ] = "player2";
+					grid[p2->posI][p2->posJ] = "player2";
 				}
 			}
 		}
 		else if (p2->key == SDLK_DOWN && p2->posI<10)
 		{
-			if (grid[p2->posI+1][p2->posJ] == "empty")
+			if (grid[p2->posI + 1][p2->posJ] == "empty")
 			{
 				p2->moving = true;
 				frameTime = 0;
@@ -299,15 +346,15 @@ void Level::Update()
 				p2->playerPosition.y += STEPS;
 				if (p2->isInPosition())
 				{
-					grid[p1->posI][p1->posJ] = "empty";
+					grid[p2->posI][p2->posJ] = "empty";
 					p2->posI++;
-					grid[p1->posI][p1->posJ] = "player2";
+					grid[p2->posI][p2->posJ] = "player2";
 				}
 			}
 		}
 		else if (p2->key == SDLK_RIGHT && p2->posJ<12)
 		{
-			if (grid[p2->posI][p2->posJ+1] == "empty")
+			if (grid[p2->posI][p2->posJ + 1] == "empty")
 			{
 				p2->moving = true;
 				frameTime = 0;
@@ -318,9 +365,9 @@ void Level::Update()
 				p2->playerPosition.x += STEPS;
 				if (p2->isInPosition())
 				{
-					grid[p1->posI][p1->posJ] = "empty";
+					grid[p2->posI][p2->posJ] = "empty";
 					p2->posJ++;
-					grid[p1->posI][p1->posJ] = "player2";
+					grid[p2->posI][p2->posJ] = "player2";
 				}
 			}
 		}
@@ -408,14 +455,19 @@ void Level::Draw()
 				SDL_Rect blockPosition = { static_cast<int>((SCREEN_WIDTH / 15)* (j + 1)), static_cast<int>(((SCREEN_HEIGHT - 80) / 13)* (i + 1) + 80), 48,48 };
 				Renderer::Instance()->PushSprite(ITEMS, blockRect, blockPosition);
 			}
+			if (grid[i][j] == "wall")
+			{
+				SDL_Rect wallPosition = { static_cast<int>((SCREEN_WIDTH / 15)* (j + 1)), static_cast<int>(((SCREEN_HEIGHT - 80) / 13)* (i + 1) + 80), 48,48 };
+				Renderer::Instance()->PushSprite(ITEMS, wallRect, wallPosition);
+			}
 		}
 	}
 	//Walls:***********************************************************************************************************************************************************
-	 for (std::list<Wall*>::const_iterator it = wallList.cbegin(); it != wallList.cend(); ++it)
+	/* for (std::list<Wall*>::const_iterator it = wallList.cbegin(); it != wallList.cend(); ++it)
 	 {
 	 w = *it;
 	 w->Draw();
-	 }
+	 }*/
 	
 	//Bombs:
 	if (p1->ptrBomb != nullptr)
