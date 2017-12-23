@@ -83,6 +83,16 @@ Level::Level(int num, bool mute) : exit{ false }, lvlNumber{ num }, frameTime { 
 			std::string tempstr = casillainfo->first_attribute("contenido")->value();
 
 			grid[tempy][tempx] = tempstr;
+			if (tempstr=="player1")
+			{
+				p1->posI = tempy;
+				p1->posJ = tempx;
+			}
+			if (tempstr == "player2")
+			{
+				p2->posI = tempy;
+				p2->posJ = tempx;
+			}
 
 		}
 	}
@@ -373,12 +383,14 @@ void Level::Update()
 		}
 		else if (p2->key == SDLK_RCTRL)
 		{
-			if (p2->ptrBomb == nullptr)
+			std::cout << "player 1:  " << p1->posI << " " << p1->posJ << std::endl;
+			std::cout << "player 2:  " << p2->posI << " " << p2->posJ << std::endl;
+			/*if (p2->ptrBomb == nullptr)
 			{
 				setExplosionLimits(p2);
 				p2->bomb(p2->explosionLimits);
 				p2->key = NULL;
-			}
+			}*/
 		}
 	}
 

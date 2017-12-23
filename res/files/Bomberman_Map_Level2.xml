@@ -8,7 +8,7 @@
 	
 	  <Casilla>
       <Position X="1" Y="0" />
-      <Content contenido="player1" />
+      <Content contenido="empty" />
     </Casilla>
 	
 	  <Casilla>
@@ -329,7 +329,7 @@
 
 	<Casilla>
       <Position X="0" Y="5" />
-      <Content contenido="empty" />
+      <Content contenido="player1" />
     </Casilla>
 	
 	  <Casilla>
@@ -389,7 +389,7 @@
 	
 	  <Casilla>
       <Position X="12" Y="5" />
-      <Content contenido="empty" />
+      <Content contenido="player2" />
     </Casilla>
 
 	<Casilla>
@@ -699,7 +699,7 @@
 	
 	  <Casilla>
       <Position X="9" Y="10" />
-      <Content contenido="player2" />
+      <Content contenido="empty" />
     </Casilla>
 	
 	  <Casilla>
