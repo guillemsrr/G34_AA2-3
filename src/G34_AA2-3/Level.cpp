@@ -15,9 +15,9 @@ Level::Level(int num, bool mute) : exit{ false }, lvlNumber{ num }, frameTime { 
 	wallRect = { frameWidth,0,frameWidth,frameHeight };
 
 	//start the grid:
-	for (int i = 0; i <= 10; i++)// i ->files
+	for (int i = 0; i <= 10; i++)// i ->files (Y)
 	{
-		for (int j = 0; j <= 12; j++)//j ->columnes
+		for (int j = 0; j <= 12; j++)//j ->columnes (X)
 		{
 			if (i == 5 && j == 0)
 			{
@@ -38,8 +38,6 @@ Level::Level(int num, bool mute) : exit{ false }, lvlNumber{ num }, frameTime { 
 				wallList.push_back(new Wall(i,j));
 				grid[i][j] = "wall";
 			}
-			//posar els blocks
-
 			else grid[i][j] = "empty";
 		}
 	}
@@ -57,6 +55,7 @@ Level::Level(int num, bool mute) : exit{ false }, lvlNumber{ num }, frameTime { 
 		Mix_PlayMusic(soundtrack, -1);
 	}
 	p1->restartExplosionLimits();
+	p2->restartExplosionLimits();
 }
 
 Level::~Level()
@@ -75,11 +74,14 @@ void Level::EventHandler()
 			break;
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_ESCAPE) exit = true;
-			//********************************************************************************************************************************
-			if(!p1->moving && !p2->moving) 
-				keyDown = event.key.keysym.sym;
-			//********************************************************************************************************************************
+			keyDown = event.key.keysym.sym;
+			if (keyUp == keyDown) keyUp = NULL;
 			break;
+		case SDL_KEYUP:
+			keyUp = event.key.keysym.sym;
+				if (keyUp == keyDown) keyDown = NULL;
+			break;
+			
 		default:;
 		}
 	}
@@ -108,8 +110,7 @@ void Level::Update()
 		}
 		m_sceneState = Scene::SceneState::GoToRanking;
 	}
-	//Movement:
-	frameTime++;
+
 	if (keyDown == SDLK_m)
 	{
 		for (int i = 0; i <= 10; i++)
@@ -120,10 +121,45 @@ void Level::Update()
 			}
 			std::cout << std::endl;
 		}
+		keyDown = NULL;
 	}
+
+	//Players movement:
+
+	//Handle KeyDown
+	//Player 1:
+	if (!p1->moving)
+	{
+		if (keyDown == SDLK_w || keyDown == SDLK_a || keyDown == SDLK_s || keyDown == SDLK_d || keyDown == SDLK_SPACE)
+		{
+			p1->key = keyDown;
+		}		
+	}
+	//Player 2:
+	if (!p2->moving)
+	{
+		if (keyDown == SDLK_UP || keyDown == SDLK_LEFT || keyDown == SDLK_DOWN || keyDown == SDLK_RIGHT || keyDown == SDLK_RCTRL)
+		{
+			p2->key = keyDown;
+		}
+	}
+	//Handle KeyUp
+	//Player 1:
+	if (keyUp == SDLK_w || keyUp == SDLK_a || keyUp == SDLK_s || keyUp == SDLK_d || keyUp == SDLK_SPACE)
+	{
+		p1->stop = true;
+	}
+	if (keyUp == SDLK_UP || keyUp == SDLK_LEFT || keyUp == SDLK_DOWN || keyUp == SDLK_RIGHT || keyUp == SDLK_RCTRL)
+	{
+		p2->stop = true;
+	}
+
+	//Actual Movement:
+	frameTime++;
 	if (SCREEN_FPS / frameTime <= SPEED)
 	{
-		if (keyDown == SDLK_w && p1->posI >0)
+		//Player 1:
+		if (p1->key == SDLK_w && p1->posI >0)
 		{
 			if (grid[p1->posI-1][p1->posJ] == "empty")
 			{
@@ -133,17 +169,17 @@ void Level::Update()
 				p1->playerRect.x += p1->playerRect.w;
 				if (p1->playerRect.x >= p1->playerRect.w * 2)
 					p1->playerRect.x = 0;
-				p1->playerPosition.y -= STEPS;//step;
+				p1->playerPosition.y -= STEPS;
 
 				if (p1->isInPosition())
 				{
-					grid[p1->posJ][p1->posI] = "empty";
+					grid[p1->posI][p1->posJ] = "empty";
 					p1->posI--;
-					grid[p1->posJ][p1->posI] = "player1";
+					grid[p1->posI][p1->posJ] = "player1";
 				}
 			}
 		}
-		else if (keyDown == SDLK_a && p1->posJ>0)
+		else if (p1->key == SDLK_a && p1->posJ>0)
 		{
 			if (grid[p1->posI][p1->posJ-1] == "empty")
 			{
@@ -153,16 +189,16 @@ void Level::Update()
 				p1->playerRect.x += p1->playerRect.w;
 				if (p1->playerRect.x >= p1->playerRect.w * 3)
 					p1->playerRect.x = 0;
-				p1->playerPosition.x -= step;
+				p1->playerPosition.x -= STEPS;
 				if (p1->isInPosition())
 				{
-					grid[p1->posJ][p1->posI] = "empty";
+					grid[p1->posI][p1->posJ] = "empty";
 					p1->posJ--;
-					grid[p1->posJ][p1->posI] = "player1";
+					grid[p1->posI][p1->posJ] = "player1";
 				}
 			}
 		}
-		else if (keyDown == SDLK_s && p1->posI<12)
+		else if (p1->key == SDLK_s && p1->posI<12)
 		{
 			if (grid[p1->posI+1][p1->posJ] == "empty")
 			{
@@ -172,17 +208,17 @@ void Level::Update()
 				p1->playerRect.x += p1->playerRect.w;
 				if (p1->playerRect.x >= p1->playerRect.w * 3)
 					p1->playerRect.x = 0;
-				p1->playerPosition.y += step;
+				p1->playerPosition.y += STEPS;
 				if (p1->isInPosition())
 				{
-					grid[p1->posJ][p1->posI] = "empty";
+					grid[p1->posI][p1->posJ] = "empty";
 					p1->posI++;
-					grid[p1->posJ][p1->posI] = "player1";
+					grid[p1->posI][p1->posJ] = "player1";
 				}
 			}
 		}
 
-		else if (keyDown == SDLK_d && p1->posJ<12)
+		else if (p1->key == SDLK_d && p1->posJ<12)
 		{
 			if (grid[p1->posI][p1->posJ+1] == "empty")
 			{
@@ -192,16 +228,27 @@ void Level::Update()
 				p1->playerRect.x += p1->playerRect.w;
 				if (p1->playerRect.x >= p1->playerRect.w * 3)
 					p1->playerRect.x = 0;
-				p1->playerPosition.x += step;
+				p1->playerPosition.x += STEPS;
 				if (p1->isInPosition())
 				{
-					grid[p1->posJ][p1->posI] = "empty";
+					grid[p1->posI][p1->posJ] = "empty";
 					p1->posJ++;
-					grid[p1->posJ][p1->posI] = "player1";
+					grid[p1->posI][p1->posJ] = "player1";
 				}
 			}
 		}
-		if (keyDown == SDLK_UP && p2->posI>0)
+		else if (p1->key == SDLK_SPACE)
+		{
+			if (p1->ptrBomb == nullptr)
+			{
+				setExplosionLimits(p1);
+				p1->bomb(p1->explosionLimits);
+				p1->key = NULL;
+			}
+		}
+
+		//Player 2:
+		if (p2->key == SDLK_UP && p2->posI>0)
 		{
 			if (grid[p2->posI-1][p2->posJ] == "empty")
 			{
@@ -211,16 +258,16 @@ void Level::Update()
 				p2->playerRect.x += p2->playerRect.w;
 				if (p2->playerRect.x >= p2->playerRect.w * 2)
 					p2->playerRect.x = 0;
-				p2->playerPosition.y -= step;
+				p2->playerPosition.y -= STEPS;
 				if (p2->isInPosition())
 				{
-					grid[p2->posJ][p2->posI] = "empty";
+					grid[p1->posI][p1->posJ] = "empty";
 					p2->posI--;
-					grid[p2->posJ][p2->posI] = "player2";
+					grid[p1->posI][p1->posJ] = "player2";
 				}
 			}
 		}
-		else if (keyDown == SDLK_LEFT && p2->posJ>0)
+		else if (p2->key == SDLK_LEFT && p2->posJ>0)
 		{
 			if (grid[p2->posI][p2->posJ-1] == "empty")
 			{
@@ -230,16 +277,16 @@ void Level::Update()
 				p2->playerRect.x += p2->playerRect.w;
 				if (p2->playerRect.x >= p2->playerRect.w * 3)
 					p2->playerRect.x = 0;
-				p2->playerPosition.x -= step;
+				p2->playerPosition.x -= STEPS;
 				if (p2->isInPosition())
 				{
-					grid[p2->posJ][p2->posI] = "empty";
+					grid[p1->posI][p1->posJ] = "empty";
 					p2->posJ--;
-					grid[p2->posJ][p2->posI] = "player2";
+					grid[p1->posI][p1->posJ] = "player2";
 				}
 			}
 		}
-		else if (keyDown == SDLK_DOWN && p2->posI<10)
+		else if (p2->key == SDLK_DOWN && p2->posI<10)
 		{
 			if (grid[p2->posI+1][p2->posJ] == "empty")
 			{
@@ -249,16 +296,16 @@ void Level::Update()
 				p2->playerRect.x += p2->playerRect.w;
 				if (p2->playerRect.x >= p2->playerRect.w * 3)
 					p2->playerRect.x = 0;
-				p2->playerPosition.y += step;
+				p2->playerPosition.y += STEPS;
 				if (p2->isInPosition())
 				{
-					grid[p2->posJ][p2->posI] = "empty";
+					grid[p1->posI][p1->posJ] = "empty";
 					p2->posI++;
-					grid[p2->posJ][p2->posI] = "player2";
+					grid[p1->posI][p1->posJ] = "player2";
 				}
 			}
 		}
-		else if (keyDown == SDLK_RIGHT && p2->posJ<12)
+		else if (p2->key == SDLK_RIGHT && p2->posJ<12)
 		{
 			if (grid[p2->posI][p2->posJ+1] == "empty")
 			{
@@ -268,206 +315,38 @@ void Level::Update()
 				p2->playerRect.x += p2->playerRect.w;
 				if (p2->playerRect.x >= p2->playerRect.w * 3)
 					p2->playerRect.x = 0;
-				p2->playerPosition.x += step;
+				p2->playerPosition.x += STEPS;
 				if (p2->isInPosition())
 				{
-					grid[p2->posJ][p2->posI] = "empty";
+					grid[p1->posI][p1->posJ] = "empty";
 					p2->posJ++;
-					grid[p2->posJ][p2->posI] = "player2";
+					grid[p1->posI][p1->posJ] = "player2";
 				}
 			}
 		}
-
-		if (keyDown == SDLK_SPACE)
-		{
-			if (p1->ptrBomb == nullptr)
-			{
-				setExplosionLimits(p1);
-				p1->bomb(p1->explosionLimits);
-			}
-		}
-		if (keyDown == SDLK_RCTRL)
+		else if (p2->key == SDLK_RCTRL)
 		{
 			if (p2->ptrBomb == nullptr)
 			{
 				setExplosionLimits(p2);
-				p2->bomb(p2->explosionLimits);//
+				p2->bomb(p2->explosionLimits);
+				p2->key = NULL;
 			}
 		}
-
-		//*******************************************************************************************************
-		if (!p2->moving && p1->isInPosition())
-		{
-			p1->moving = false;
-			keyDown = NULL;
-		}
-
-		if (!p1->moving && p2->isInPosition())
-		{
-			p2->moving = false;
-			keyDown = NULL;
-		}
-		//*******************************************************************************************************
 	}
 
-	//Map Limits:
-	if (p1->playerPosition.x >= SCREEN_WIDTH - SCREEN_WIDTH / 15 * 2)
+	if (p1->isInPosition() && p1->stop)
 	{
-		p1->playerPosition.x = SCREEN_WIDTH - SCREEN_WIDTH / 15 * 2;
+		p1->key = NULL;
 		p1->moving = false;
+		p1->stop = false;
 	}
-	if (p1->playerPosition.x < SCREEN_WIDTH / 15)
+	if (p2->isInPosition() && p2->stop)
 	{
-		p1->playerPosition.x = SCREEN_WIDTH / 15;
-		p1->moving = false;
-	}
-		
-	if (p1->playerPosition.y < (SCREEN_HEIGHT - 80) / 13 + 80)
-	{
-		p1->playerPosition.y = (SCREEN_HEIGHT - 80) / 13 + 80;
-		p1->moving = false;
-	}
-	//*******************************************************************************************************	
-	if (p1->playerPosition.y > (SCREEN_HEIGHT - ((SCREEN_HEIGHT - 80) / 13 + 80)))
-	{
-		p1->playerPosition.y = SCREEN_HEIGHT - ((SCREEN_HEIGHT - 80) / 13 + 80);
-		p1->moving = false;
-	}
-		
-
-	if (p2->playerPosition.x > SCREEN_WIDTH - SCREEN_WIDTH / 15 * 2)
-	{
-		p2->playerPosition.x = SCREEN_WIDTH - SCREEN_WIDTH / 15 * 2;
+		p2->key = NULL;
 		p2->moving = false;
+		p2->stop = false;
 	}
-		
-	if (p2->playerPosition.x < SCREEN_WIDTH / 15)
-	{
-		p2->playerPosition.x = SCREEN_WIDTH / 15;
-		p2->moving = false;
-	}
-	if (p2->playerPosition.y < (SCREEN_HEIGHT - 80) / 13 + 80)
-	{
-		p2->playerPosition.y = (SCREEN_HEIGHT - 80) / 13 + 80;
-		p2->moving = false;
-	}
-	if (p2->playerPosition.y > (SCREEN_HEIGHT - ((SCREEN_HEIGHT - 80) / 13 + 80)))
-	{
-		p2->playerPosition.y = SCREEN_HEIGHT - ((SCREEN_HEIGHT - 80) / 13 + 80);
-		p2->moving = false;
-	}
-
-	//Blocks Collisions:
-	/*for (std::list<SDL_Rect>::const_iterator it = blockList.cbegin(); it != blockList.cend(); ++it)//CANVIAR PER GRID[][]//*******************************************************************************************************
-	{
-		if (isCollisioning(p1->playerPosition, *it))
-		{
-			if (keyDown == SDLK_w)
-			{
-				
-					p1->playerPosition.y += STEPS;
-					p1->moving = false;
-				}
-			}
-			else if (keyDown == SDLK_a)
-
-
-
-
-			{
-				p1->playerPosition.x += step;
-				p1->moving = false;
-			}
-			else if (keyDown == SDLK_s)
-			{
-				p1->playerPosition.y -= step;
-				p1->moving = false;
-			}
-
-			else if (keyDown == SDLK_d)
-			{
-				p1->playerPosition.x -= step;
-				p1->moving = false;
-			}
-		}
-		if (isCollisioning(p2->playerPosition, *it))
-		{
-			if (keyDown == SDLK_UP)
-			{
-				p2->playerPosition.y += step;
-				p2->moving = false;
-			}
-			else if (keyDown == SDLK_LEFT)
-			{
-				p2->playerPosition.x += step;
-				p2->moving = false;
-			}
-			else if (keyDown == SDLK_DOWN)
-			{
-				p2->playerPosition.y -= step;
-				p2->moving = false;
-			}
-			else if (keyDown == SDLK_RIGHT)
-			{
-				p2->playerPosition.x -= step;
-				p2->moving = false;
-			}
-		}
-	}*/
-	//Wall Collisions:
-	
-	/*for (std::list<Wall*>::const_iterator it = wallList.cbegin(); it != wallList.cend(); ++it)
-	{
-		w = *it;
-		if (isCollisioning(p1->playerPosition, w->wallPosition))
-		{
-			if (keyDown == SDLK_w)
-			{
-				p1->playerPosition.y += step;
-				p1->moving = false;
-
-			}
-			else if (keyDown == SDLK_a)
-			{
-				p1->playerPosition.x += step;
-				p1->moving = false;
-			}
-			else if (keyDown == SDLK_s)
-			{
-				p1->playerPosition.y -= step;
-				p1->moving = false;
-			}
-
-			else if (keyDown == SDLK_d)
-			{
-				p1->playerPosition.x -= step;
-				p1->moving = false;
-			}
-		}
-		if (isCollisioning(p2->playerPosition, w->wallPosition))
-		{
-			if (keyDown == SDLK_UP)
-			{
-				p2->playerPosition.y += step;
-				p2->moving = false;
-			}
-			else if (keyDown == SDLK_LEFT)
-			{
-				p2->playerPosition.x += step;
-				p2->moving = false;
-			}
-			else if (keyDown == SDLK_DOWN)
-			{
-				p2->playerPosition.y -= step;
-				p2->moving = false;
-			}
-			else if (keyDown == SDLK_RIGHT)
-			{
-				p2->playerPosition.x -= step;
-				p2->moving = false;
-			}
-		}
-	}*/
 
 	//Bombs:
 	if (p1->ptrBomb != nullptr)
@@ -519,7 +398,7 @@ void Level::Draw()
 	//Background
 	Renderer::Instance()->PushImage(LEVEL_BG, { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT });
 	
-	//Blocks://*******************************************************************************************************//*******************************************************************************************************
+	//Blocks://**************************************************************************************************************************************************
 	for (int i = 0; i <= 10; i++)
 	{
 		for (int j = 0; j <= 12; j++)
@@ -528,16 +407,15 @@ void Level::Draw()
 			{
 				SDL_Rect blockPosition = { static_cast<int>((SCREEN_WIDTH / 15)* (j + 1)), static_cast<int>(((SCREEN_HEIGHT - 80) / 13)* (i + 1) + 80), 48,48 };
 				Renderer::Instance()->PushSprite(ITEMS, blockRect, blockPosition);
-				blockList.push_back(blockPosition);
-				//grid[i][j] = "block";
-			}
-			else if (grid[i][j] == "wall")
-			{
-				w = new Wall(i,j);
-				w->Draw();
 			}
 		}
-	}//*******************************************************************************************************//*******************************************************************************************************
+	}
+	//Walls:***********************************************************************************************************************************************************
+	 for (std::list<Wall*>::const_iterator it = wallList.cbegin(); it != wallList.cend(); ++it)
+	 {
+	 w = *it;
+	 w->Draw();
+	 }
 	
 	//Bombs:
 	if (p1->ptrBomb != nullptr)
@@ -558,11 +436,6 @@ void Level::Draw()
 	//HUD:
 	m_hud->Draw();
 	
-	/*for (std::list<Wall*>::const_iterator it = wallList.cbegin(); it != wallList.cend(); ++it)
-	{
-		w = *it;
-		w->Draw();
-	}*/
 	Renderer::Instance()->Render();
 }
 

@@ -25,17 +25,16 @@ private:
 	Player *p1, *p2;
 	int lvlNumber, textWidth, textHeight, frameWidth, frameHeight, frameTime;
 	//control:
-	std::string grid[11][13];
-	int keyDown, step=STEPS;
-	SDL_Rect blockRect, wallRect; //helmetRect, shieldRect, rollerRect;
-	std::list<SDL_Rect> blockList;
+	std::string grid[11][13]; //grid[files][columnes] o grid[Y][X]
+	int keyDown, keyUp;
+	SDL_Rect blockRect, wallRect;
 	bool exit;
 
 	//explosions:
 	void setExplosionLimits(Player *p);
-
 	void checkDamage(Player *p);
 	void changePlayerLocation(Player *p);
+
 	HUD *m_hud;
 	Wall *w;
 	std::list<Wall*> wallList;

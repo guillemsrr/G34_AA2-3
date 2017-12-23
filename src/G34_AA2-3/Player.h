@@ -20,8 +20,8 @@ public:
 	void bomb(bool explodingLimits[8]);
 	Bomb *ptrBomb;
 	bool isInPosition();
-	bool moving;
-	int posJ, posI, lives, points;
+	bool moving, stop;
+	int key,posJ, posI, lives, points;
 
 private:
 	int playerTag, textWidth, textHeight, frameWidth, frameHeight, frameTime;
