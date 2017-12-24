@@ -212,14 +212,24 @@ void Level::Update()
 		p2->stop = true;
 	}
 
+	//check speed power ups:
+	if (p1->powerSpeed)
+	{
+		p1->setPowerSpeed();
+	}
+	if (p2->powerSpeed)
+	{
+		p2->setPowerSpeed();
+	}
+
 	//Actual Movement:
 	frameTime++;
-	if (SCREEN_FPS / frameTime <= SPEED)
+	if (SCREEN_FPS / frameTime <= p1->extraSteps*SPEED)
 	{
 		//Player 1:
-		if (p1->key == SDLK_w && p1->posI >0)
+		if (p1->key == SDLK_w && p1->posI > 0)
 		{
-			if (grid[p1->posI-1][p1->posJ] == "empty")
+			if (grid[p1->posI - 1][p1->posJ] == "empty")
 			{
 				p1->moving = true;
 				frameTime = 0;
@@ -237,9 +247,9 @@ void Level::Update()
 				}
 			}
 		}
-		else if (p1->key == SDLK_a && p1->posJ>0)
+		else if (p1->key == SDLK_a && p1->posJ > 0)
 		{
-			if (grid[p1->posI][p1->posJ-1] == "empty")
+			if (grid[p1->posI][p1->posJ - 1] == "empty")
 			{
 				p1->moving = true;
 				frameTime = 0;
@@ -256,9 +266,9 @@ void Level::Update()
 				}
 			}
 		}
-		else if (p1->key == SDLK_s && p1->posI<12)
+		else if (p1->key == SDLK_s && p1->posI < 12)
 		{
-			if (grid[p1->posI+1][p1->posJ] == "empty")
+			if (grid[p1->posI + 1][p1->posJ] == "empty")
 			{
 				p1->moving = true;
 				frameTime = 0;
@@ -276,9 +286,9 @@ void Level::Update()
 			}
 		}
 
-		else if (p1->key == SDLK_d && p1->posJ<12)
+		else if (p1->key == SDLK_d && p1->posJ < 12)
 		{
-			if (grid[p1->posI][p1->posJ+1] == "empty")
+			if (grid[p1->posI][p1->posJ + 1] == "empty")
 			{
 				p1->moving = true;
 				frameTime = 0;
@@ -304,9 +314,11 @@ void Level::Update()
 				p1->key = NULL;
 			}
 		}
-
+	}
+	if (SCREEN_FPS / frameTime <= p2->extraSteps*SPEED)
+	{
 		//Player 2:
-		if (p2->key == SDLK_UP && p2->posI>0)
+		if (p2->key == SDLK_UP && p2->posI > 0)
 		{
 			if (grid[p2->posI - 1][p2->posJ] == "empty")
 			{
@@ -325,7 +337,7 @@ void Level::Update()
 				}
 			}
 		}
-		else if (p2->key == SDLK_LEFT && p2->posJ>0)
+		else if (p2->key == SDLK_LEFT && p2->posJ > 0)
 		{
 			if (grid[p2->posI][p2->posJ - 1] == "empty")
 			{
@@ -344,7 +356,7 @@ void Level::Update()
 				}
 			}
 		}
-		else if (p2->key == SDLK_DOWN && p2->posI<10)
+		else if (p2->key == SDLK_DOWN && p2->posI < 10)
 		{
 			if (grid[p2->posI + 1][p2->posJ] == "empty")
 			{
@@ -363,7 +375,7 @@ void Level::Update()
 				}
 			}
 		}
-		else if (p2->key == SDLK_RIGHT && p2->posJ<12)
+		else if (p2->key == SDLK_RIGHT && p2->posJ < 12)
 		{
 			if (grid[p2->posI][p2->posJ + 1] == "empty")
 			{
@@ -384,7 +396,7 @@ void Level::Update()
 		}
 		else if (p2->key == SDLK_RCTRL)
 		{
-		
+
 			if (p2->ptrBomb == nullptr)
 			{
 				setExplosionLimits(p2);
@@ -448,6 +460,9 @@ void Level::Update()
 
 	//HUD:
 	m_hud->Update();
+
+	//WALLS and powerUps:
+	upgradeWallList();
 }
 
 void Level::Draw()
@@ -467,19 +482,19 @@ void Level::Draw()
 				SDL_Rect blockPosition = { static_cast<int>((SCREEN_WIDTH / 15)* (j + 1)), static_cast<int>(((SCREEN_HEIGHT - 80) / 13)* (i + 1) + 80), 48,48 };
 				Renderer::Instance()->PushSprite(ITEMS, blockRect, blockPosition);
 			}
-			if (grid[i][j] == "wall")
-			{
-				SDL_Rect wallPosition = { static_cast<int>((SCREEN_WIDTH / 15)* (j + 1)), static_cast<int>(((SCREEN_HEIGHT - 80) / 13)* (i + 1) + 80), 48,48 };
-				Renderer::Instance()->PushSprite(ITEMS, wallRect, wallPosition);
-			}
+			//if (grid[i][j] == "wall")
+			//{
+			//	SDL_Rect wallPosition = { static_cast<int>((SCREEN_WIDTH / 15)* (j + 1)), static_cast<int>(((SCREEN_HEIGHT - 80) / 13)* (i + 1) + 80), 48,48 };
+			//	Renderer::Instance()->PushSprite(ITEMS, wallRect, wallPosition);
+			//}
 		}
 	}
 	//Walls:***********************************************************************************************************************************************************
-	/* for (std::list<Wall*>::const_iterator it = wallList.cbegin(); it != wallList.cend(); ++it)
+	for (std::list<Wall*>::const_iterator it = wallList.cbegin(); it != wallList.cend(); ++it)
 	 {
 	 w = *it;
 	 w->Draw();
-	 }*/
+	 }
 	
 	//Bombs:
 	if (p1->ptrBomb != nullptr)
@@ -551,14 +566,14 @@ void Level::checkDamage(Player *p)
 		int f = p->ptrBomb->posI - 2;
 		int c = p->ptrBomb->posJ;
 
-		if (grid[f][c] == "player1")
+		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
 			p1->lives--;
 			if(p->getPlayerTag() == 2) p2->points += 100;
 			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[f][c] == "player2")
+		else if (grid[f][c] == "player2" && !p2->powerShield)
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
@@ -577,14 +592,14 @@ void Level::checkDamage(Player *p)
 		int f = p->ptrBomb->posI - 1;
 		int c = p->ptrBomb->posJ;
 
-		if (grid[f][c] == "player1")
+		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
 			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[f][c] == "player2")
+		else if (grid[f][c] == "player2" && !p2->powerShield)
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
@@ -603,14 +618,14 @@ void Level::checkDamage(Player *p)
 		int f = p->ptrBomb->posI;
 		int c = p->ptrBomb->posJ-1;
 
-		if (grid[f][c] == "player1")
+		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
 			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[f][c] == "player2")
+		else if (grid[f][c] == "player2" && !p2->powerShield)
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
@@ -629,14 +644,14 @@ void Level::checkDamage(Player *p)
 		int f = p->ptrBomb->posI;
 		int c = p->ptrBomb->posJ-2;
 
-		if (grid[f][c] == "player1")
+		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
 			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[f][c] == "player2")
+		else if (grid[f][c] == "player2" && !p2->powerShield)
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
@@ -655,14 +670,14 @@ void Level::checkDamage(Player *p)
 		int f = p->ptrBomb->posI;
 		int c = p->ptrBomb->posJ+1;
 
-		if (grid[f][c] == "player1")
+		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
 			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[f][c] == "player2")
+		else if (grid[f][c] == "player2" && !p2->powerShield)
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
@@ -681,14 +696,14 @@ void Level::checkDamage(Player *p)
 		int f = p->ptrBomb->posI;
 		int c = p->ptrBomb->posJ+2;
 
-		if (grid[f][c] == "player1")
+		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
 			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[f][c] == "player2")
+		else if (grid[f][c] == "player2" && !p2->powerShield)
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
@@ -707,14 +722,14 @@ void Level::checkDamage(Player *p)
 		int f = p->ptrBomb->posI + 1;
 		int c = p->ptrBomb->posJ;
 
-		if (grid[f][c] == "player1")
+		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
 			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[f][c] == "player2")
+		else if (grid[f][c] == "player2" && !p2->powerShield)
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
@@ -733,14 +748,14 @@ void Level::checkDamage(Player *p)
 		int f = p->ptrBomb->posI + 2;
 		int c = p->ptrBomb->posJ;
 
-		if (grid[f][c] == "player1")
+		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
 			p1->lives--;
 			if (p->getPlayerTag() == 2) p2->points += 100;
 			grid[f][c] = "empty";
 			changePlayerLocation(p1);
 		}
-		else if (grid[f][c] == "player2")
+		else if (grid[f][c] == "player2" && !p2->powerShield)
 		{
 			p2->lives--;
 			if (p->getPlayerTag() == 1) p1->points += 100;
@@ -858,5 +873,47 @@ void Level::putNameRanking(Player *p)
 		fsalida.write(reinterpret_cast<char *>(&w.points), sizeof(int));
 
 		fsalida.close();
+	}
+}
+
+void Level::upgradeWallList()
+{
+	std::list<Wall*>::iterator it = wallList.begin();
+	while(it != wallList.end())
+	{
+		w = *it;
+		w->Update();
+		
+		if (w->playerGotIt(p1))
+		{
+			if (w->casc)
+			{
+				p1->powerShield = true;
+			}
+			else if (w->pati)
+			{
+				p1->powerSpeed = true;
+			}
+		}
+		else if (w->playerGotIt(p2))
+		{
+			if (w->casc)
+			{
+				p2->powerShield = true;
+			}
+			else if (w->pati)
+			{
+				p2->powerSpeed = true;
+			}
+		}
+		if (w->destroy)
+		{
+			w = nullptr;
+			it=wallList.erase(it);
+		}
+		else
+		{
+			it++;
+		}
 	}
 }

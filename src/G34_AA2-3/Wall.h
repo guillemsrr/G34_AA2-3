@@ -1,5 +1,7 @@
 #pragma once
 #include "GameObject.h"
+#include "Player.h"
+#include <time.h>
 class Wall :
 	public GameObject
 {
@@ -16,10 +18,13 @@ public:
 	int textWidth, textHeight, frameWidth, frameHeight;
 	SDL_Rect wallRect, wallPosition;
 
-	bool destroy;
-	void playerGotIt();
+	bool destroy, pati, casc;
+	bool playerGotIt(Player *p);
 private:
 	void createPowerUp();
 	bool powerUpMode;
+	//TIME:
+	time_t start;
+	int timer;
 };
 

@@ -2,7 +2,7 @@
 
 
 
-Wall::Wall(int x, int y): posI{x}, posJ{y}, powerUpMode{false},destroy{false}
+Wall::Wall(int x, int y): posI{x}, posJ{y}, powerUpMode{false},destroy{false},timer{10}, pati{false},casc{false}
 {
 	Renderer::Instance()->LoadTexture(ITEMS, PATH_IMG + "items.png");
 	textWidth = Renderer::Instance()->GetTextureSize(ITEMS).x;
@@ -11,6 +11,7 @@ Wall::Wall(int x, int y): posI{x}, posJ{y}, powerUpMode{false},destroy{false}
 	frameHeight = textHeight / 2;
 	wallRect = { frameWidth, 0,frameWidth,frameHeight };
 	wallPosition = { static_cast<int>((SCREEN_WIDTH / 15)* (posJ + 1)), static_cast<int>(((SCREEN_HEIGHT - 80) / 13)* (posI + 1) + 80), 48,48 };
+
 }
 
 
@@ -20,8 +21,15 @@ Wall::~Wall()
 
 void Wall::Update()
 {
-
+	if (powerUpMode)
+	{
+		if (difftime(time(0), start) >= timer)
+		{
+			destroy = true;//tens 10 segons per agafar-lo, després es destrueix.
+		}
+	}
 }
+
 void Wall::Draw()
 {
 	if (!destroy)
@@ -32,23 +40,35 @@ void Wall::Draw()
 
 void Wall::destroyWall()
 {
-	if ((rand() % 100) < 100)
+	if ((rand() % 100) < 20)
 	{
 		powerUpMode = true;
 		createPowerUp();
 	} 
-	else{
-		destroy = true;
-	}
-}
-void Wall::createPowerUp()
-{
-	wallRect = { frameWidth*(rand() % 2 + 1), frameHeight,frameWidth,frameHeight };
+	else destroy = true;
 }
 
-void Wall::playerGotIt()
+void Wall::createPowerUp()
 {
-	destroy = true;
+	int n = rand() % 2 + 1;
+	if (n == 1) pati = true;
+	else if (n == 2) casc = true;
+	start = time(0);
+	wallRect = { frameWidth*(n), frameHeight,frameWidth,frameHeight };
+}
+
+bool Wall::playerGotIt(Player *p)
+{
+	if (p->posI == posI && p->posJ == posJ)
+	{
+		destroy = true;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	
 }
 
 
