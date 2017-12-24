@@ -423,7 +423,6 @@ void Level::Update()
 			if (p1->ptrBomb->explode)
 			{
 				checkDamage(p1);
-				checkDamage(p2);
 			}
 		}
 		if (p1->ptrBomb->end)
@@ -441,7 +440,6 @@ void Level::Update()
 			p2->ptrBomb->Update();
 			if (p2->ptrBomb->explode)
 			{
-				checkDamage(p1);
 				checkDamage(p2);
 			}
 		}
@@ -556,10 +554,30 @@ void Level::setExplosionLimits(Player *p)
 
 void Level::checkDamage(Player *p)
 {
+
+	int f = p->ptrBomb->posI;
+	int c = p->ptrBomb->posJ;
+
+	if (grid[f][c] == "player1" && !p1->powerShield)
+	{
+		p1->lives--;
+		if (p->getPlayerTag() == 2) p2->points += 100;
+		grid[f][c] = "empty";
+		changePlayerLocation(p1);
+	}
+	else if (grid[f][c] == "player2" && !p2->powerShield)
+	{
+		p2->lives--;
+		if (p->getPlayerTag() == 1) p1->points += 100;
+		grid[f][c] = "empty";
+		changePlayerLocation(p2);
+	}
+
+
 	if (p->explosionLimits[0])
 	{
-		int f = p->ptrBomb->posI - 2;
-		int c = p->ptrBomb->posJ;
+		f = p->ptrBomb->posI - 2;
+		c = p->ptrBomb->posJ;
 
 		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
@@ -584,8 +602,8 @@ void Level::checkDamage(Player *p)
 	}
 	if (p->explosionLimits[1])
 	{
-		int f = p->ptrBomb->posI - 1;
-		int c = p->ptrBomb->posJ;
+		f = p->ptrBomb->posI - 1;
+		c = p->ptrBomb->posJ;
 
 		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
@@ -610,8 +628,8 @@ void Level::checkDamage(Player *p)
 	}
 	if (p->explosionLimits[2])
 	{
-		int f = p->ptrBomb->posI;
-		int c = p->ptrBomb->posJ-1;
+		f = p->ptrBomb->posI;
+		c = p->ptrBomb->posJ-1;
 
 		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
@@ -636,8 +654,8 @@ void Level::checkDamage(Player *p)
 	}
 	if (p->explosionLimits[3])
 	{
-		int f = p->ptrBomb->posI;
-		int c = p->ptrBomb->posJ-2;
+		f = p->ptrBomb->posI;
+		c = p->ptrBomb->posJ-2;
 
 		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
@@ -662,8 +680,8 @@ void Level::checkDamage(Player *p)
 	}
 	if (p->explosionLimits[4])
 	{
-		int f = p->ptrBomb->posI;
-		int c = p->ptrBomb->posJ+1;
+		f = p->ptrBomb->posI;
+		c = p->ptrBomb->posJ+1;
 
 		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
@@ -688,8 +706,8 @@ void Level::checkDamage(Player *p)
 	}
 	if (p->explosionLimits[5])
 	{
-		int f = p->ptrBomb->posI;
-		int c = p->ptrBomb->posJ+2;
+		f = p->ptrBomb->posI;
+		c = p->ptrBomb->posJ+2;
 
 		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
@@ -714,8 +732,8 @@ void Level::checkDamage(Player *p)
 	}
 	if (p->explosionLimits[6])
 	{
-		int f = p->ptrBomb->posI + 1;
-		int c = p->ptrBomb->posJ;
+		f = p->ptrBomb->posI + 1;
+		c = p->ptrBomb->posJ;
 
 		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
@@ -740,8 +758,8 @@ void Level::checkDamage(Player *p)
 	}
 	if (p->explosionLimits[7])
 	{
-		int f = p->ptrBomb->posI + 2;
-		int c = p->ptrBomb->posJ;
+		f = p->ptrBomb->posI + 2;
+		c = p->ptrBomb->posJ;
 
 		if (grid[f][c] == "player1" && !p1->powerShield)
 		{
