@@ -9,6 +9,7 @@
 
 Level::Level(int num, bool mute) : exit{ false }, lvlNumber{ num }, frameTime { 0 }, keyDown{ 0 }, p1{ new Player(1) }, p2{ new Player(2) }, m_hud{ new HUD(p1, p2) }
 {
+	srand(time(NULL));
 	m_sceneState= Scene::SceneState::Running;
 	Renderer::Instance()->LoadTexture(LEVEL_BG, PATH_IMG + "bgGame.jpg");
 	Renderer::Instance()->LoadTexture(ITEMS, PATH_IMG + "items.png");
