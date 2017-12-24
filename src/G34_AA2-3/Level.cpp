@@ -24,37 +24,55 @@ Level::Level(int num, bool mute) : exit{ false }, lvlNumber{ num }, frameTime { 
 	frameHeight = textHeight / 2;
 	wallRect = { frameWidth, 0,frameWidth,frameHeight };
 	
-	//start the grid:
+	for (int i = 0; i <= 10; i++)// i ->files
+	{
+		for (int j = 0; j <= 12; j++)//j ->columnes
+		{
+			grid[i][j] = "empty";
+		}
+	}
+
 	if (lvlNumber == 1)
 	{
-		for (int i = 0; i <= 10; i++)// i ->files
-		{
-			for (int j = 0; j <= 12; j++)//j ->columnes
-			{
-				if (i == 5 && j == 0)
-				{
-					grid[i][j] = "player1";
-					p1->posI = i;
-					p1->posJ = j;
-				}
-				else if (i == 5 && j == 12)
-				{
-					grid[i][j] = "player2";
-					p2->posI = i;
-					p2->posJ = j;
-				}
-				else if (i % 2 == 1 && j % 2 == 1)
-					grid[i][j] = "block";
-				else if (rand() % 4 == 1)
-				{
-					wallList.push_back(new Wall(i, j));
-					grid[i][j] = "wall";
-				}
-				//posar els blocks
+		rapidxml::xml_document<> doc;
+		rapidxml::xml_node<> * root_node;
+		// Read the xml file into a vector
+		std::ifstream theFile("../../res/files/config.xml");
+		std::vector<char> buffer((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
+		buffer.push_back('\0');
+		// Parse the buffer using the xml file parsing library into doc
+		doc.parse<0>(&buffer[0]);
 
-				else grid[i][j] = "empty";
-			}
+		root_node = doc.first_node("Game");
+		rapidxml::xml_node<> * level = root_node->first_node("Level");
+		m_hud->timer = 5;// atoi(level->first_attribute("time")->value());
+		p1->lives = atoi(level->first_attribute("lives")->value());
+		p2->lives = atoi(level->first_attribute("lives")->value());
+		rapidxml::xml_node<> * estructura2 = level->first_node("Fixed");
+		for (rapidxml::xml_node<> * block = estructura2->first_node("Wall"); block; block = block->next_sibling())
+		{
+			int tempx = atoi(block->first_attribute("i")->value());
+			int	tempy = atoi(block->first_attribute("j")->value());;
+			grid[tempx][tempy] = "block";
+			std::cout << "block  i:  " << tempx << "  j: " << tempy << std::endl;
 		}
+
+		rapidxml::xml_node<> * estructura = level->first_node("Destructible");
+		for (rapidxml::xml_node<> * walls = estructura->first_node("Wall"); walls; walls = walls->next_sibling())
+		{
+			int tempy = atoi(walls->first_attribute("i")->value());
+			int	tempx = atoi(walls->first_attribute("j")->value());;
+			grid[tempy][tempx] = "wall";
+			wallList.push_back(new Wall(tempy, tempx));
+		}
+
+		grid[5][0] = "player1";
+		grid[5][12] = "player2";
+		p2->posI = 5;
+		p2->posJ = 12;
+
+		p1->posI = 5;
+		p1->posJ = 0;
 	}
 	else
 	{
@@ -67,35 +85,39 @@ Level::Level(int num, bool mute) : exit{ false }, lvlNumber{ num }, frameTime { 
 		// Parse the buffer using the xml file parsing library into doc
 		doc.parse<0>(&buffer[0]);
 
-		root_node = doc.first_node("Map");
-		int i = 0;
-		for (rapidxml::xml_node<> * casillas = root_node->first_node("Casilla"); casillas; casillas = casillas->next_sibling())
+		root_node = doc.first_node("Game");
+		rapidxml::xml_node<> * level = root_node->last_node("Level");
+		//level->next_sibling();
+		m_hud->timer = atoi(level->first_attribute("time")->value());
+		p1->lives = atoi(level->first_attribute("lives")->value());
+		p2->lives = atoi(level->first_attribute("lives")->value());
+		rapidxml::xml_node<> * estructura = level->first_node("Destructible");
+		for (rapidxml::xml_node<> * walls = estructura->first_node("Wall"); walls; walls = walls->next_sibling())
 		{
-
-
-
-			rapidxml::xml_node<> * casillainfo = casillas->first_node("Position");
-
-			int tempx = atoi(casillainfo->first_attribute("X")->value());
-			int	tempy = atoi(casillainfo->first_attribute("Y")->value());;
-			//std::cout << i << std::endl;//tempx << "  " << tempy << std::endl;
-			casillainfo = casillas->first_node("Content");
-			std::string tempstr = casillainfo->first_attribute("contenido")->value();
-
-			grid[tempy][tempx] = tempstr;
-			if (tempstr=="player1")
-			{
-				p1->posI = tempy;
-				p1->posJ = tempx;
-			}
-			if (tempstr == "player2")
-			{
-				p2->posI = tempy;
-				p2->posJ = tempx;
-			}
-
+			int tempy = atoi(walls->first_attribute("i")->value());
+			int	tempx = atoi(walls->first_attribute("j")->value());;
+			grid[tempy][tempx] = "wall";
+			wallList.push_back(new Wall(tempy, tempx));
 		}
+		rapidxml::xml_node<> * estructura2 = level->first_node("Fixed");
+		for (rapidxml::xml_node<> * block = estructura2->first_node("Wall"); block; block = block->next_sibling())
+		{
+			int tempx = atoi(block->first_attribute("i")->value());
+			int	tempy = atoi(block->first_attribute("j")->value());;
+			grid[tempx][tempy] = "block";
+			std::cout << "block  i:  " << tempx << "  j: " << tempy << std::endl;
+		}
+		grid[5][0] = "player1";
+		grid[5][12] = "player2";
+		p2->posI = 5;
+		p2->posJ = 12;
+
+		p1->posI = 5;
+		p1->posJ = 0;
+
 	}
+
+
 
 	// Audio:
 	m_mute = mute;
