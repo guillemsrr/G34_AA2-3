@@ -35,10 +35,14 @@ private:
 	void checkDamage(Player *p);
 	void changePlayerLocation(Player *p);
 
+	//hud:
 	HUD *m_hud;
+
+	//Walls and PowerUps:
 	Wall *w;
 	std::list<Wall*> wallList;
 	void detectWall(int x, int y);
+	void upgradeWallList();
 
 	//RANKING:
 	const std::string rankingFile = PATH_FILES + "ranking.bin";

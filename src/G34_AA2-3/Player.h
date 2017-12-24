@@ -6,6 +6,7 @@
 #include "Constants.h"
 #include <SDL_ttf.h>
 #include "Bomb.h"
+#include <time.h>
 
 class Player//:
 	//public GameObject//caldria fer que també fes ell mateix Update i Draw
@@ -22,7 +23,11 @@ public:
 	bool isInPosition();
 	bool moving, stop;
 	int key,posJ, posI, lives, points;
+	bool powerSpeed, powerShield;
+	float extraSteps;
+	void setPowerSpeed();
 
 private:
-	int playerTag, textWidth, textHeight, frameWidth, frameHeight, frameTime;
+	int playerTag, textWidth, textHeight, frameWidth, frameHeight, frameTime, start;
+	bool begin;
 };

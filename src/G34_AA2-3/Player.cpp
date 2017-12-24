@@ -1,6 +1,6 @@
 #include "Player.h"
 
-Player::Player(int num) : playerTag{ num }, ptrBomb{ nullptr }, moving{ false }, stop{ false }, lives { 3 }, points{ 0 }
+Player::Player(int num) : playerTag{ num }, ptrBomb{ nullptr }, moving{ false }, stop{ false }, lives { 3 }, points{ 0 }, powerShield{false}, powerSpeed{false},extraSteps{1},begin{true}
 {
 	Renderer::Instance()->LoadTexture(PLAYER1_SPRITE, PATH_IMG + "player1.png");
 	Renderer::Instance()->LoadTexture(PLAYER2_SPRITE, PATH_IMG + "player2.png");
@@ -53,6 +53,22 @@ void Player::restartExplosionLimits()
 	for (int i = 0; i <= 7; i++)
 	{
 		explosionLimits[i] = false;
+	}
+}
+
+void Player::setPowerSpeed()
+{
+	if (begin)
+	{
+		extraSteps = 1.8;
+		start=time(0);
+		begin = false;
+	}
+	if (difftime(time(0), start) == 10)
+	{
+		extraSteps = 1.0;
+		powerSpeed = false;
+		begin = true;
 	}
 }
 
