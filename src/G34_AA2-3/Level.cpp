@@ -144,12 +144,8 @@ void Level::EventHandler()
 void Level::Update()
 {
 	if (exit) m_sceneState = Scene::SceneState::Exit;
-	int prova = 0;
-	//prova = 78;
-	if (m_hud->timer <= prova || p1->lives==0|| p2->lives==0)
+	if (m_hud->timer <= 0 || p1->lives==0|| p2->lives==0)
 	{
-		p1->points = prova;
-
 		if (p1->points > p2->points)
 		{
 			putNameRanking(p1);
@@ -813,24 +809,26 @@ void Level::putNameRanking(Player *p)
 	if (fileExists(rankingFile))
 	{
 		int n;
-		winner w;
 		bool introduced=false;
 
 		std::ifstream fentrada(rankingFile, std::ios::in | std::ios::binary);
-		fentrada.read(reinterpret_cast<char *>(&n), sizeof(n));
-		std::cout << "number of winners: " << n << std::endl;
+		fentrada.read(reinterpret_cast<char *>(&n), sizeof(int));
+		std::cout << "Number of winners: " << n << std::endl;
 
-		std::vector<winner> rankingVector;
+		std::vector<winner*> rankingVector;
 
 		for (int i = 0; i < n; i++)
 		{
-			fentrada.read(reinterpret_cast<char *>(&w), sizeof(w));
-			if (!introduced && p->points > w.points)
+			winner *w = new winner;
+			fentrada.read(reinterpret_cast<char *>(&w->name), sizeof(std::string));
+			fentrada.read(reinterpret_cast<char *>(&w->points), sizeof(int));
+
+			if (!introduced && p->points >= w->points)
 			{
-				winner newWinner;
+				winner *newWinner=new winner;
 				std::cout << "Introduce your name: \n";
-				std::cin >> newWinner.name;
-				newWinner.points = p->points;
+				std::cin >> newWinner->name;
+				newWinner->points = p->points;
 				rankingVector.push_back(newWinner);
 				if (n < 10)
 				{
@@ -848,12 +846,14 @@ void Level::putNameRanking(Player *p)
 
 		if (introduced)//upgrade binary file
 		{
+			winner *w;
 			std::ofstream fsalida(rankingFile, std::ios::out | std::ios::binary);
 			fsalida.write(reinterpret_cast<char *>(&n), sizeof(n));
 			for (int i = 0; i < n; i++)
 			{
 				w = rankingVector[i];
-				fsalida.write(reinterpret_cast<char *>(&w), sizeof(w));
+				fsalida.write(reinterpret_cast<char *>(&w->name), sizeof(std::string));
+				fsalida.write(reinterpret_cast<char *>(&w->points), sizeof(int));
 			}
 			fsalida.close();
 		}	
@@ -869,7 +869,7 @@ void Level::putNameRanking(Player *p)
 		fsalida.write(reinterpret_cast<char *>(&n), sizeof(int));
 		fsalida.write(reinterpret_cast<char *>(&w.name), sizeof(std::string));
 		fsalida.write(reinterpret_cast<char *>(&w.points), sizeof(int));
-
+		std::cout << "Winner introduced\n";
 		fsalida.close();
 	}
 }

@@ -14,11 +14,11 @@ public:
 	void Draw() override; 
 
 private:
-	static constexpr SDL_Rect level1Rect = { static_cast<int>(SCREEN_WIDTH / 2.5),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 5 )*5),137,81 };
-	static constexpr SDL_Rect level2Rect = { static_cast<int>(SCREEN_WIDTH / 2.5),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 5) * 4),137,81 };
-	static constexpr SDL_Rect rankingRect = { static_cast<int>(SCREEN_WIDTH / 2.5),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 5) * 3),137,81 };
-	static constexpr SDL_Rect soundRect = { static_cast<int>(SCREEN_WIDTH / 2.5),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 5) * 2),137,81 };
-	static constexpr SDL_Rect exitRect = { static_cast<int>(SCREEN_WIDTH / 2.5),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 5)*1), 145,81 };
+	static constexpr SDL_Rect level1Rect = { static_cast<int>(SCREEN_WIDTH / 2.5 - 25),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 5 )*5),200,81 };
+	static constexpr SDL_Rect level2Rect = { static_cast<int>(SCREEN_WIDTH / 2.5 - 25),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 5) * 4),200,81 };
+	static constexpr SDL_Rect rankingRect = { static_cast<int>(SCREEN_WIDTH / 2.5 - 25),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 5) * 3),200,81 };
+	static constexpr SDL_Rect soundRect = { static_cast<int>(SCREEN_WIDTH / 2.5 - 75),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 5) * 2),300,81 };
+	static constexpr SDL_Rect exitRect = { static_cast<int>(SCREEN_WIDTH / 2.5),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 5)*1), 150,81 };
 
 	bool hoverLevel1, hoverLevel2, hoverRanking, hoverSound, hoverExit, mouseClicked, exit;
 	SDL_Rect mouseRect;

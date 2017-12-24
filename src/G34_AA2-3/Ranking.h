@@ -14,13 +14,14 @@ public:
 	void Draw() override;
 
 private:
-	std::vector<winner> rankingVector;
+	std::vector<winner*> rankingVector;
 	const std::string rankingFile= PATH_FILES + "ranking.bin";
 	bool fileExists(const std::string fileName);
 
-	static constexpr SDL_Rect returnRect = { static_cast<int>(SCREEN_WIDTH / 2.5),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 11) * 1), 145,81 };
+	static constexpr SDL_Rect returnRect = { static_cast<int>(SCREEN_WIDTH / 2.5),static_cast<int>(SCREEN_HEIGHT - (SCREEN_HEIGHT / 11) - 20), 145,81 };
 
 	SDL_Rect mouseRect;
-	bool hoverReturn, exit, mouseClicked;
+	bool hoverReturn, exit, mouseClicked, gotFile;
+	void getFileWinners();
 
 };
