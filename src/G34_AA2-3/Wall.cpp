@@ -12,7 +12,6 @@ Wall::Wall(int x, int y): posI{x}, posJ{y}, powerUpMode{false},destroy{false},ti
 	wallRect = { frameWidth, 0,frameWidth,frameHeight };
 	wallPosition = { static_cast<int>((SCREEN_WIDTH / 15)* (posJ + 1)), static_cast<int>(((SCREEN_HEIGHT - 80) / 13)* (posI + 1) + 80), 48,48 };
 
-	start = time(0);
 }
 
 
@@ -22,13 +21,13 @@ Wall::~Wall()
 
 void Wall::Update()
 {
-	//if (powerUpMode)
-	//{
-	//	if (difftime(time(0), start) == timer)
-	//	{
-	//		destroy = true;//tens 10 segons per agafar-lo, després es destrueix.
-	//	}
-	//}
+	if (powerUpMode)
+	{
+		if (difftime(time(0), start) >= timer)
+		{
+			destroy = true;//tens 10 segons per agafar-lo, després es destrueix.
+		}
+	}
 }
 
 void Wall::Draw()
@@ -41,7 +40,7 @@ void Wall::Draw()
 
 void Wall::destroyWall()
 {
-	if ((rand() % 100) < 100)
+	if ((rand() % 100) < 20)
 	{
 		powerUpMode = true;
 		createPowerUp();
@@ -54,7 +53,7 @@ void Wall::createPowerUp()
 	int n = rand() % 2 + 1;
 	if (n == 1) pati = true;
 	else if (n == 2) casc = true;
-
+	start = time(0);
 	wallRect = { frameWidth*(n), frameHeight,frameWidth,frameHeight };
 }
 
