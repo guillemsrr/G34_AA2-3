@@ -4,9 +4,9 @@ HUD::HUD(Player *p1, Player *p2): player1{p1}, player2{p2}
 {
 	start = time(0);
 	timer = 80;
-	Renderer::Instance()->LoadFont({ GAME_OVER, PATH_FONT + "game_over.ttf", 80 });	
-	Renderer::Instance()->LoadTextureText(GAME_OVER, { PLAYER1_TEXT, "Player 1:     lives,    points",{ 255, 255, 255, 255 } ,HUD_WIDTH , HUD_HEIGHT });
-	Renderer::Instance()->LoadTextureText(GAME_OVER, { PLAYER2_TEXT, "Player 2:     lives,    points",{ 255, 255, 255, 255 } ,HUD_WIDTH , HUD_HEIGHT});
+	Renderer::Instance()->LoadFont({ GAME_OVER, PATH_FONT + "game_over.ttf", 50 });	
+	Renderer::Instance()->LoadTextureText(GAME_OVER, { PLAYER1_TEXT, "Player 1:     lives,      points",{ 255, 255, 255, 255 } ,HUD_WIDTH , HUD_HEIGHT });
+	Renderer::Instance()->LoadTextureText(GAME_OVER, { PLAYER2_TEXT, "Player 2:     lives,      points",{ 255, 255, 255, 255 } ,HUD_WIDTH , HUD_HEIGHT});
 }
 
 HUD::~HUD()
