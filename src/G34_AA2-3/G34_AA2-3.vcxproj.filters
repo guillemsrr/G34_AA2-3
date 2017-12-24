@@ -59,16 +59,10 @@
     <ClCompile Include="Bomb.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Drawable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Grid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HUD.cpp">

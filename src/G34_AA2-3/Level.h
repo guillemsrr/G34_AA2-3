@@ -5,7 +5,6 @@
 #include <vector>
 #include "HUD.h"
 #include "Wall.h"
-#include "Grid.h"
 #include <fstream>
 #include <vector>
 
